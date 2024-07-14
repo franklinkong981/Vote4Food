@@ -26,6 +26,17 @@ class User(db.Model):
     location_lat = db.Column(db.Float)
     location_long = db.Column(db.Float)
 
+    # Relationships to link a user to their list of restaurant/menu item reviews and favorites.
+    restaurant_reviews = db.relationship('Restaurant_Review', cascade='all, delete', backref='author')
+    restaurant_favorites = db.relationship('Restaurant_Favorite', cascade='all, delete', backref='author')
+    item_reviews = db.relationship('Item_Review', cascade='all, delete', backref='author')
+    item_favorites = db.relationship('Item_Favorite', cascade='all, delete', backref='author')
+
+    # Relationships to link a user to the list of restaurants and menu items they favorited so information about them can be
+    # easily accessed via the navbar.
+    favorite_restaurants = db.relationship('Restaurant', secondary='restaurant_favorites', backref='favorite_users')
+    favorite_items = db.relationship('Item', secondary='item_favorites', backref='favorite_users')
+
 class Restaurant(db.Model):
     """Restaurant location, NOT restaurant chain. Each location of a restaurant will be a different instance of the Restaurant model.
     This is for restaurant location lookup. Contains some restaurant location data taken from the API so that locations that have
@@ -41,6 +52,10 @@ class Restaurant(db.Model):
     store_photo_url = db.Column(db.Text)
     logo_photo_url = db.Column(db.Text, default="vote4food_default")
 
+    # Relationships to link a restaurant location to the list of reviews and favorites for it.
+    reviews = db.relationship('Restaurant_Review', cascade='all, delete', backref='restaurant')
+    favorites = db.relationship('Restaurant_Favorite', cascade='all, delete', backref='restaurant')
+
 class Item(db.Model):
     """Restaurant menu item. Contains some data for a menu item taken from the API so that items that have been reviewed 
     and/or favorited by the user can be accessed quickly."""
@@ -52,11 +67,15 @@ class Item(db.Model):
     restaurant_chain = db.Column(db.Text)
     image_url = db.Column(db.Text, default="vote4food_default")
 
+    # Relationships to link a menu item to the list of reviews and favorites for it.
+    reviews = db.relationship('Item_Review', cascade='all, delete', backref='item')
+    favorites = db.relationship('Item_Favorite', cascade='all, delete', bacref='item')
+
 class Restaurant_Review(db.Model):
     """A user can create a review for a specific restaurant location. Each restaurant review only has one author, and a user can create
     multiple reviews for the same restaurant location. Users can also update and delete the restaurant reviews they created."""
 
-    __tablename__ = "restaurant-reviews"
+    __tablename__ = "restaurant_reviews"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
@@ -69,7 +88,7 @@ class Item_Review(db.Model):
     """A user can create a review for a restaurant chain's menu item. Each item review only has one author, and a user can create 
     multiple reviews for the same menu item. Users can also update and delete the menu item reviews they created."""
 
-    __tablename__ = "item-reviews"
+    __tablename__ = "item_reviews"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
@@ -82,7 +101,7 @@ class Restaurant_Favorite(db.Model):
     """A user can mark a specific restaurant location as a favorite and will be able to view a list of their favorite restaurant
     locations on the top navbar."""
 
-    __tablename__ = "restaurant-favorites"
+    __tablename__ = "restaurant_favorites"
 
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
     restaurant_id = db.Column(db.Text, db.ForeignKey('restaurants.id'), primary_key=True)
@@ -92,7 +111,7 @@ class Item_Favorite(db.Model):
     """A user can mark a specific menu item from a chain restaurant as a favorite and will be able to view a list 
     of their favorite menu items on the top navbar."""
 
-    __tablename__ = "item-favorites"
+    __tablename__ = "item_favorites"
 
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
     item_id = db.Column(db.Integer, db.ForeignKey('items.id'), primary_key=True)
