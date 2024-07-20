@@ -29,7 +29,7 @@ def create_app(db_name, testing=False):
     else:
         app.config['SQLALCHEMY_ECHO'] = True
     
-     #Routes and view functions for the application.
+    #Routes and view functions for the application.
 
     ##############################################################################
     @app.route('/')

@@ -23,6 +23,10 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     
     # Once logged in, users can set their address which will be converted into longitude and latitude for restaurant lookup.
+    address_street = db.Column(db.Text)
+    address_city = db.Column(db.Text)
+    address_state = db.Column(db.String(2))
+    address_zip = db.Column(db.String(5))
     location_lat = db.Column(db.Float)
     location_long = db.Column(db.Float)
 
@@ -69,7 +73,7 @@ class Item(db.Model):
 
     # Relationships to link a menu item to the list of reviews and favorites for it.
     reviews = db.relationship('Item_Review', cascade='all, delete', backref='item')
-    favorites = db.relationship('Item_Favorite', cascade='all, delete', bacref='item')
+    favorites = db.relationship('Item_Favorite', cascade='all, delete', backref='item')
 
 class Restaurant_Review(db.Model):
     """A user can create a review for a specific restaurant location. Each restaurant review only has one author, and a user can create
@@ -124,5 +128,5 @@ def connect_db(app):
     That is, links the database with the models set up in this file as the database for the Vouch4Food application initialized in app.py"""
     with app.app_context():
         db.app = app
-        db.init_app()
+        db.init_app(app)
         db.create_all() #Create all tables specified by the models above in the database.
