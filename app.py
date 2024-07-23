@@ -10,6 +10,10 @@ from sqlalchemy.exc import IntegrityError
 # from forms import 
 from models import db, connect_db, User, Restaurant, Item, Restaurant_Review, Item_Review, Restaurant_Favorite, Item_Favorite
 
+"""This key will be in the Flask session and contain the logged in user's id once a user successfully logs in, will be removed once a user
+successfully logs out."""
+CURRENT_USER_KEY = "logged_in_user"
+
 def create_app(db_name, testing=False):
     """Create an instance of the app to ensure separate production database and testing database, and that sample data inserted into
     database for unit/integration testing purposes doesn't interfere with actual database for production."""
@@ -30,6 +34,29 @@ def create_app(db_name, testing=False):
         app.config['SQLALCHEMY_ECHO'] = True
     
     #Routes and view functions for the application.
+
+    ##############################################################################
+    # Functions for user login/logout, as well as convenient access to logged in user information.
+
+    @app.before_request
+    def add_user_to_g_object():
+        """Before sending each request, a user is currently logged in, add the logged in user's instance to the Flask g object."""
+
+        if CURRENT_USER_KEY in session:
+            g.user = User.query.get_or_404(session[CURRENT_USER_KEY])
+        else:
+            g.user = None
+    
+    def login_user(user):
+        """Add user's id to the Flask session to indicate that this user is currently logged in."""
+
+        session[CURRENT_USER_KEY] = user.id
+    
+    def logout_user():
+        """Remove the previously logged in user's id from the Flask session to indicate no user is currently logged in."""
+
+        del session[CURRENT_USER_KEY]
+
 
     ##############################################################################
     @app.route('/')

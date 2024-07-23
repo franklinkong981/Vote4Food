@@ -66,7 +66,7 @@ class Item(db.Model):
 
     __tablename__ = "items"
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.Text, nullable=False)
     restaurant_chain = db.Column(db.Text)
     image_url = db.Column(db.Text, default="vote4food_default")
