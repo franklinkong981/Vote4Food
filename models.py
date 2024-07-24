@@ -18,8 +18,8 @@ class User(db.Model):
     first_name = db.Column(db.Text, nullable=False)
     last_name = db.Column(db.Text, nullable=False)
     email = db.Column(db.Text, nullable=False, unique=True)
-    password = db.Column(db.Text, nullable=False)
     user_image_url = db.Column(db.Text, default="vote4food_default")
+    password = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     
     # Once logged in, users can set their address which will be converted into longitude and latitude for restaurant lookup.
@@ -29,6 +29,38 @@ class User(db.Model):
     address_zip = db.Column(db.String(5))
     location_lat = db.Column(db.Float)
     location_long = db.Column(db.Float)
+
+    @classmethod
+    def signup_user(cls, first_name, last_name, email, user_image_url, password):
+        """Creates and returns a new user model instance out of the input parameters and hashes the password using bcrypt."""
+
+        hashed_password = bcrypt.generate_password_hash(password).decode('UTF-8')
+        new_user = User(
+            first_name = first_name,
+            last_name = last_name,
+            email = email,
+            user_image_url = user_image_url,
+            password = hashed_password
+        )
+
+        db.session.add(new_user)
+        return new_user
+    
+    @classmethod
+    def authenticate_user(cls, email, password):
+        """Attempts to find a user in the database whose email and password matches the parameter inputs. Returns the user if found,
+        False if not found."""
+
+        # emails are unique so we only need the first result.
+        user = cls.query.filter_by(email=email).first()
+
+        if user:
+            do_passwords_match = bcrypt.check_password_hash(user.password, password)
+            if do_passwords_match:
+                return user
+        
+        return False
+
 
     # Relationships to link a user to their list of restaurant/menu item reviews and favorites.
     restaurant_reviews = db.relationship('Restaurant_Review', cascade='all, delete', backref='author')
