@@ -47,6 +47,22 @@ def create_app(db_name, testing=False):
         else:
             g.user = None
     
+    def is_user_not_logged_in(error_message):
+        """Called when user must be logged out to access the page. If user is currently logged in, redirects them to the home page
+        with an error message."""
+
+        if g.user:
+            flash(error_message, "danger")
+            return redirect('/')
+    
+    def is_user_logged_in(error_message):
+        """Called when the user must be logged in to access the page. If user is currently logged out, redirects them to the home page
+        with an error message."""
+
+        if not g.user:
+            flash(error_message, "danger")
+            return redirect('/')
+    
     def login_user(user):
         """Add user's id to the Flask session to indicate that this user is currently logged in."""
 
@@ -56,6 +72,11 @@ def create_app(db_name, testing=False):
         """Remove the previously logged in user's id from the Flask session to indicate no user is currently logged in."""
 
         del session[CURRENT_USER_KEY]
+    
+    @app.route('/signup', methods=['GET', 'POST'])
+    def handle_signup():
+        is_user_logged_in("You already have an account and are signed in!")
+        return "WHERE YOU LEFT OFF"
 
 
     ##############################################################################
