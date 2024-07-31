@@ -7,7 +7,7 @@ from flask import Flask, render_template, request, flash, redirect, session, g
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 
-# from forms import 
+from forms import SignUpForm, LoginForm
 from models import db, connect_db, User, Restaurant, Item, Restaurant_Review, Item_Review, Restaurant_Favorite, Item_Favorite
 
 """This key will be in the Flask session and contain the logged in user's id once a user successfully logs in, will be removed once a user
@@ -47,22 +47,6 @@ def create_app(db_name, testing=False):
         else:
             g.user = None
     
-    def is_user_not_logged_in(error_message):
-        """Called when user must be logged out to access the page. If user is currently logged in, redirects them to the home page
-        with an error message."""
-
-        if g.user:
-            flash(error_message, "danger")
-            return redirect('/')
-    
-    def is_user_logged_in(error_message):
-        """Called when the user must be logged in to access the page. If user is currently logged out, redirects them to the home page
-        with an error message."""
-
-        if not g.user:
-            flash(error_message, "danger")
-            return redirect('/')
-    
     def login_user(user):
         """Add user's id to the Flask session to indicate that this user is currently logged in."""
 
@@ -75,8 +59,54 @@ def create_app(db_name, testing=False):
     
     @app.route('/signup', methods=['GET', 'POST'])
     def handle_signup():
-        is_user_logged_in("You already have an account and are signed in!")
-        return "WHERE YOU LEFT OFF"
+        """If GET request, display user signup form. If POST request (user has submitted signup form), create a new User model instance,
+         add the new user to the database, and redirect user to login form. If errors occur (ex. email already taken by another user),
+         redirect to signup form with error message."""
+
+        # If user is already signed in, redirect to their home page.
+        if not g.user:
+            flash("You already have an account and are signed in", "danger")
+            return redirect('/')
+
+        form = SignUpForm()
+
+        if form.validate_on_submit():
+            try:
+                new_user = User.create_user(
+                    first_name = form.first_name.data,
+                    last_name = form.last_name.data,
+                    email = form.email.data,
+                    user_image_url = form.user_image_url.data or User.user_image_url.default.arg,
+                    password = form.password.data
+                )
+                db.session.commit()
+
+                # If user successfully signs up, redirect them to login page and prompt them to sign in.
+                flash("Your account has been successfully created! Now please log in.")
+                login_form = LoginForm()
+                return render_template('users/login.html', form=login_form)
+            except IntegrityError as exc:
+                # Only possible error not covered by WTForms validation is uniqueness of the email.
+                flash("The email you inputted already has an account associated with it", "danger")
+                print(f"ERROR: {exc}")
+            except:
+                # Issue with connecting to SQLAlchemy database.
+                flash("There was an error in connecting/accessing the database. Please try again later.", "danger")
+
+        return render_template('users/signup.html', form=form)
+    
+    @app.route('/login', methods=['GET', 'POST'])
+    def handle_login():
+        """If GET request, display user login form. If POST request (user has submitted login form), attempt to login user. If successful,
+        redirect to signed in homepage. If errors occur (can't find email in database or hashed password doesn't match), redirect to
+        login form with error message."""
+        
+        # If user is already signed in, redirect to their home page.
+        if not g.user:
+            flash("You already have an account and are signed in", "danger")
+            return redirect('/')
+
+        # WHERE YOU LEFT OFF
 
 
     ##############################################################################
