@@ -113,7 +113,20 @@ def create_app(db_name, testing=False):
                 user = User.authenticate_user(form.email.data, form.password.data)
 
                 # user = 0 if email isn't found, 1 if email is found but password doesn't match.
-                
+                if user != 0 and user != 1:
+                    login_user(user)
+                    flash(f"Hello, {user.get_full_name()}!", "success")
+                    return redirect("/")
+                elif user == 0:
+                    flash("The email you entered is not associated with any current account.", "danger")
+                else:
+                    # user == 1
+                    flash("The password you entered is incorrect.", "danger")
+            except:
+                # Issue with connecting to SQLAlchemy database.
+                flash("There was an error in connecting/accessing the database. Please try again later.", "danger")
+        
+        return render_template('users/login.html', form=form)
 
     ##############################################################################
     @app.route('/')
