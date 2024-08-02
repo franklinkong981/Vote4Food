@@ -143,7 +143,11 @@ def create_app(db_name, testing=False):
     ##############################################################################
     @app.route('/')
     def homepage():
-        return render_template('home-anon.html')
+        """If user is logged in, show logged in homepage. If user is logged out, show logged out homepage."""
+        if g.user:
+            return render_template("home.html")
+        else:
+            return render_template("home_anon.html")
 
 
     ##############################################################################
