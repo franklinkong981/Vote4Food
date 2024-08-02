@@ -18,6 +18,6 @@ class SignUpForm(FlaskForm):
 class LoginForm(FlaskForm):
     """Defines the form for user login. Users will need to provide the same username and password they provided when signing up."""
 
-    email = StringField('Email Address:', validators=[DataRequired(message="Please enter your email!"), Email("The email address must be valid!")])
+    email = StringField('Email Address:', validators=[DataRequired(message="Please enter your email!")])
     password = PasswordField('Password:', validators=[DataRequired(message="Please enter your password!")])
 

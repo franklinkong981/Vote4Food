@@ -64,7 +64,7 @@ def create_app(db_name, testing=False):
          redirect to signup form with error message."""
 
         # If user is already signed in, redirect to their home page.
-        if not g.user:
+        if g.user:
             flash("You already have an account and are signed in", "danger")
             return redirect('/')
 
@@ -102,12 +102,18 @@ def create_app(db_name, testing=False):
         login form with error message."""
         
         # If user is already signed in, redirect to their home page.
-        if not g.user:
+        if g.user:
             flash("You already have an account and are signed in", "danger")
             return redirect('/')
 
-        # WHERE YOU LEFT OFF
+        form = LoginForm()
 
+        if form.validate_on_submit():
+            try:
+                user = User.authenticate_user(form.email.data, form.password.data)
+
+                # user = 0 if email isn't found, 1 if email is found but password doesn't match.
+                
 
     ##############################################################################
     @app.route('/')

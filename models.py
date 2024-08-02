@@ -46,10 +46,11 @@ class User(db.Model):
         db.session.add(new_user)
         return new_user
     
+    
     @classmethod
     def authenticate_user(cls, email, password):
         """Attempts to find a user in the database whose email and password matches the parameter inputs. Returns the user if found,
-        False if not found."""
+        0 if the user with the email isn't found in the database, and 1 user is found but the hashed password doesn't match."""
 
         # emails are unique so we only need the first result.
         user = cls.query.filter_by(email=email).first()
@@ -58,8 +59,9 @@ class User(db.Model):
             do_passwords_match = bcrypt.check_password_hash(user.password, password)
             if do_passwords_match:
                 return user
+            return 1
         
-        return False
+        return 0
 
 
     # Relationships to link a user to their list of restaurant/menu item reviews and favorites.
