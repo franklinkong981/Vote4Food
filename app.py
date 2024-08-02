@@ -127,6 +127,18 @@ def create_app(db_name, testing=False):
                 flash("There was an error in connecting/accessing the database. Please try again later.", "danger")
         
         return render_template('users/login.html', form=form)
+    
+    @app.route('/logout')
+    def handle_logout():
+        """Sign out the user and redirect them to the signed out homepage."""
+
+        if not g.user:
+            flash("You already were not signed in", "danger")
+            return redirect("/")
+
+        logout_user()
+        flash("Successfully logged out.", "success")
+        return redirect("/")
 
     ##############################################################################
     @app.route('/')
