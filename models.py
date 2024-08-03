@@ -18,7 +18,7 @@ class User(db.Model):
     first_name = db.Column(db.Text, nullable=False)
     last_name = db.Column(db.Text, nullable=False)
     email = db.Column(db.Text, nullable=False, unique=True)
-    user_image_url = db.Column(db.Text, default="vote4food_default")
+    user_image_url = db.Column(db.Text, default="/static/images/default-profile-image.jpg")
     password = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     

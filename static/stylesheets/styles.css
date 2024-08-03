@@ -1,3 +1,7 @@
-auth-navbar {
+.auth-navbar {
     background-color: red;
+}
+
+.user-profile-picture {
+    width: 1000px;
 }

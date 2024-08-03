@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %} Vouch4Food - Signup {% endblock %}
+
+{% block content %}
+
+  <div class="row justify-content-md-center">
+    <div class="col-md-7 col-lg-5">
+        <h2 class="display-2">Create an account to Vouch 4 Food today.</h2>
+        <form method="POST">
+            {{ form.hidden_tag() }}
+
+            {% for field in form if field.widget.input_type != 'hidden' %}
+                <p>
+                    {{ field.label }}
+                    {{ field(class_="form-control") }}
+        
+                    {% for error in field.errors %}
+                        <p class="form-text text-danger">{{ error }}</p>
+                    {% endfor %}
+                </p>
+            {% endfor %}
+            
+            <a class="btn btn-danger btn-sm btn-block" href="{{url_for('homepage')}}">Cancel</a>
+            <button class="btn btn-success btn-lg btn-block">Create account</button>
+        </form>
+    </div>
+  </div>
+
+{% endblock %}
