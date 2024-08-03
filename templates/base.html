@@ -9,8 +9,8 @@
     </head>
     <body>
 
-        {% for msg in get_flashed_messages() %}
-            <p>{{msg}}</p>
+        {% for category, message in get_flashed_messages(with_categories=True) %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
         {% endfor %}
 
         <div class="auth-navbar">

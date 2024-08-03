@@ -83,8 +83,7 @@ def create_app(db_name, testing=False):
 
                 # If user successfully signs up, redirect them to login page and prompt them to sign in.
                 flash("Your account has been successfully created! Now please log in.")
-                login_form = LoginForm()
-                return render_template('users/login.html', form=login_form)
+                return redirect('/login')
             except IntegrityError as exc:
                 # Only possible error not covered by WTForms validation is uniqueness of the email.
                 flash("The email you inputted already has an account associated with it", "danger")
