@@ -66,6 +66,17 @@ class User(db.Model):
             return 1
         
         return 0
+    
+    @classmethod
+    def confirm_password(cls, id, password):
+        """Make sure that the hashed password matches the user with the specified id's current hashed password."""
+
+        user = cls.query.get(id)
+
+        if user:
+            return bcrypt.check_password_hash(user.password, password)
+        
+        return False
 
 
     # Relationships to link a user to their list of restaurant/menu item reviews and favorites.

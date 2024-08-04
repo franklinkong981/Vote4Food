@@ -7,7 +7,7 @@ from flask import Flask, render_template, request, flash, redirect, session, g
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 
-from forms import SignUpForm, LoginForm
+from forms import SignUpForm, LoginForm, EditProfileForm
 from models import db, connect_db, User, Restaurant, Item, Restaurant_Review, Item_Review, Restaurant_Favorite, Item_Favorite
 
 """This key will be in the Flask session and contain the logged in user's id once a user successfully logs in, will be removed once a user
@@ -142,9 +142,41 @@ def create_app(db_name, testing=False):
     ##############################################################################
     # Routes relevant to the logged in user, such as user profile information, user's reviews, and user's favorite restaurants/menu items.
 
-    @app.route('/users/profile/update')
+    @app.route('/users/profile/update', methods=['GET', 'POST'])
     def update_profile_form():
-        return redirect("/")
+        """Show the form that allows the logged in user to edit their profile information. They must enter their current password
+        for the form to submit and the changes to be saved."""
+
+        if not g.user:
+            flash("Please sign in to update your profile information", "danger")
+            return redirect("/")
+        
+        form = EditProfileForm(obj=g.user)
+        if form.validate_on_submit():
+            # Need to make current password user entered matches before proceeding with editing profile information.
+            if User.confirm_password(session[CURRENT_USER_KEY], form.current_password.data):
+                g.user.first_name = form.first_name.data
+                g.user.last_name = form.last_name.data
+                g.user.email = form.email.data
+                g.user_image_url = form.user_image_url.data or None
+                g.user.password = form.password.data
+
+                try:
+                    db.session.commit()
+
+                    flash("Profile successfully updated", "success")
+                    return redirect("/")
+                except IntegrityError as exc:
+                    # If IntegrityError occurs, only problem not covered by form validation is non-unique email.
+                    flash("Unable to update profile, new email entered is already associated with another account", "danger")
+                    print(f"ERROR: {exc}")
+                except:
+                    # Issue with connecting to SQLAlchemy database.
+                    flash("There was an error in connecting/accessing the database. Please try again later.", "danger")  
+            else:
+                flash("The current password you entered does not match the current password associated with your account", "danger")
+
+        return render_template("users/edit.html", form=form)          
 
 
     ##############################################################################
