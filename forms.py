@@ -21,3 +21,15 @@ class LoginForm(FlaskForm):
     email = StringField('Email Address:', validators=[DataRequired(message="Please enter your email!")])
     password = PasswordField('Password:', validators=[DataRequired(message="Please enter your password!")])
 
+class EditProfileForm(FlaskForm):
+    """Defines the form that a logged in user can use to edit their profile information. Users can edit their first name, last name,
+    email, profile picture, and password. They must also enter their current password to save the changes."""
+
+    first_name = StringField('First Name:', validators=[DataRequired(message="You must provide a first name!")])
+    last_name = StringField('Last Name:', validators=[DataRequired(message="You must provide a last name!")])
+    email = StringField('Email Address:', validators=[DataRequired(message="You must provide an email!"), Email("You must provide a valid email address!")])
+    user_image_url = StringField('Profile Image URL (optional):', validators=[Optional()])
+    password = PasswordField('Password:', validators=[DataRequired(message="You must provide a password!"), Length(min=8,message="Your password must be at least 8 characters long!")])
+    current_password = PasswordField('Enter your current password to make changes', validators=[DataRequired(message="You must enter your current password to make changes!")])
+
+

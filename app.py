@@ -140,6 +140,14 @@ def create_app(db_name, testing=False):
         return redirect("/")
 
     ##############################################################################
+    # Routes relevant to the logged in user, such as user profile information, user's reviews, and user's favorite restaurants/menu items.
+
+    @app.route('/users/profile/update')
+    def update_profile_form():
+        return redirect("/")
+
+
+    ##############################################################################
     @app.route('/')
     def homepage():
         """If user is logged in, show logged in homepage. If user is logged out, show logged out homepage."""

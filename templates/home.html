@@ -7,6 +7,8 @@
 <img class="user-profile-picture" src="{{g.user.user_image_url}}" alt="{{g.user.get_full_name()}}'s profile picture"/>
 <h2 class="display-2">{{g.user.get_full_name()}}</h2>
 
+<a class="btn btn-secondary" href="#">Update profile.</a>
+
 <h4 class="display-4">Current location:</h4>
 {% if (not g.user.location_lat) and (not g.user.location_long) %}
     <p>You do not yet have a current location.</p>
