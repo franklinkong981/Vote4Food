@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %} Vouch4Food - Profile {% endblock %}
+
+{% block content %}
+
+<img class="user-profile-picture" src="{{g.user.user_image_url}}" alt="{{g.user.get_full_name()}}'s profile picture"/>
+<h2 class="display-2">{{g.user.get_full_name()}}</h2>
+
+<h2 class="display-2">Account Information</h2>
+<p>First name: {{g.user.first_name}}</p>
+<p>Last name: {{g.user.last_name}}</p>
+<p>Email: {{g.user.email}}</p>
+<p>Account created at: {{g.user.created_at}}</p>
+
+<a class="btn btn-info" href="{{url_for('update_profile_form')}}">Update Profile Information</a>
+
+<h4 class="display-4">Current Location:</h4>
+{% if (not g.user.location_lat) and (not g.user.location_long) %}
+    <p>You do not yet have a current location.</p>
+    <a class="btn btn-warning" href="#">Set current location.</a>
+{% else %}
+    <p>Congrats! You have a location!</p>
+{% endif %}
+
+{% endblock %}

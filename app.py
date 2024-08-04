@@ -142,6 +142,16 @@ def create_app(db_name, testing=False):
     ##############################################################################
     # Routes relevant to the logged in user, such as user profile information, user's reviews, and user's favorite restaurants/menu items.
 
+    @app.route('/users/profile')
+    def show_profile_info():
+        """Shows information about the current logged in user, including the user's name, email, and location if they have one."""
+
+        if not g.user:
+            flash("Please sign in to view your profile information", "danger")
+            return redirect("/")
+        
+        return render_template("/users/profile.html")
+
     @app.route('/users/profile/update', methods=['GET', 'POST'])
     def update_profile_form():
         """Show the form that allows the logged in user to edit their profile information. They must enter their current password
@@ -165,7 +175,7 @@ def create_app(db_name, testing=False):
                     db.session.commit()
 
                     flash("Profile successfully updated", "success")
-                    return redirect("/")
+                    return redirect("/users/profile")
                 except IntegrityError as exc:
                     # If IntegrityError occurs, only problem not covered by form validation is non-unique email.
                     flash("Unable to update profile, new email entered is already associated with another account", "danger")
