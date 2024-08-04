@@ -29,7 +29,6 @@ class EditProfileForm(FlaskForm):
     last_name = StringField('Last Name:', validators=[DataRequired(message="You must provide a last name!")])
     email = StringField('Email Address:', validators=[DataRequired(message="You must provide an email!"), Email("You must provide a valid email address!")])
     user_image_url = StringField('Profile Image URL (optional):', validators=[Optional()])
-    password = PasswordField('Password:', validators=[DataRequired(message="You must provide a password!"), Length(min=8,message="Your password must be at least 8 characters long!")])
     current_password = PasswordField('Current Password:', validators=[DataRequired(message="You must enter your current password to make changes!")])
 
 

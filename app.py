@@ -82,7 +82,7 @@ def create_app(db_name, testing=False):
                 db.session.commit()
 
                 # If user successfully signs up, redirect them to login page and prompt them to sign in.
-                flash("Your account has been successfully created! Now please log in.")
+                flash("Your account has been successfully created! Now please log in.", "success")
                 return redirect('/login')
             except IntegrityError as exc:
                 # Only possible error not covered by WTForms validation is uniqueness of the email.

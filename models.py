@@ -77,6 +77,14 @@ class User(db.Model):
             return bcrypt.check_password_hash(user.password, password)
         
         return False
+    
+    @classmethod
+    def update_password(cls, id, new_password):
+        """Updates the user with specific id's password by generating a new hash to new_password."""
+
+        user = cls.query.get(id)
+        new_hashed_password = bcrypt.generate_password_hash(new_password).decode('UTF-8')
+        user.password = new_hashed_password
 
 
     # Relationships to link a user to their list of restaurant/menu item reviews and favorites.
