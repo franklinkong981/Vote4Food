@@ -7,7 +7,7 @@ from flask import Flask, render_template, request, flash, redirect, session, g
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 
-from forms import SignUpForm, LoginForm, EditProfileForm
+from forms import SignUpForm, LoginForm, EditProfileForm, ChangePasswordForm
 from models import db, connect_db, User, Restaurant, Item, Restaurant_Review, Item_Review, Restaurant_Favorite, Item_Favorite
 
 """This key will be in the Flask session and contain the logged in user's id once a user successfully logs in, will be removed once a user
@@ -169,7 +169,6 @@ def create_app(db_name, testing=False):
                 g.user.last_name = form.last_name.data
                 g.user.email = form.email.data
                 g.user_image_url = form.user_image_url.data or None
-                g.user.password = form.password.data
 
                 try:
                     db.session.commit()
@@ -186,7 +185,35 @@ def create_app(db_name, testing=False):
             else:
                 flash("The current password you entered does not match the current password associated with your account", "danger")
 
-        return render_template("users/edit.html", form=form)          
+        return render_template("users/edit.html", form=form)
+
+    @app.route('/users/profile/update_password', methods=['GET', 'POST'])
+    def update_password():
+        """Show the form that allows the logged in user to update their password. They must enter a new password and their current password
+        for the password to be successfully updated."""
+
+        if not g.user:
+            flash("Please sign in to update your password", "danger")
+            return redirect("/")
+
+        form = ChangePasswordForm()
+        if form.validate_on_submit():
+            # Need to make current password user entered matches before proceeding with updating password.
+            if User.confirm_password(session[CURRENT_USER_KEY], form.current_password.data):
+                User.update_password(session[CURRENT_USER_KEY], form.new_password.data)
+
+                try:
+                    db.session.commit()
+
+                    flash("Password successfully updated", "success")
+                    return redirect("/users/profile")
+                except:
+                    # Issue with connecting to SQLAlchemy database.
+                    flash("There was an error in connecting/accessing the database. Please try again later.", "danger")
+            else:
+                flash("The current password you entered does not match the current password associated with your account", "danger")
+        
+        return render_template("users/edit_password.html", form=form)
 
 
     ##############################################################################

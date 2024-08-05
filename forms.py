@@ -31,4 +31,10 @@ class EditProfileForm(FlaskForm):
     user_image_url = StringField('Profile Image URL (optional):', validators=[Optional()])
     current_password = PasswordField('Current Password:', validators=[DataRequired(message="You must enter your current password to make changes!")])
 
+class ChangePasswordForm(FlaskForm):
+    """Defines the form that a logged in user can use to update their password. Users must also enter their current password to finalize the change."""
+
+    current_password = PasswordField('Current Password:', validators=[DataRequired(message="You must provide your current password!")])
+    new_password = PasswordField('New Password:', validators=[DataRequired(message="You must provide a new password!"), Length(min=8,message="Your new password must be at least 8 characters long!")])
+
 

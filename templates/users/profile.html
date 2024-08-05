@@ -16,6 +16,7 @@
 <p>Account created at: {{g.user.created_at}}</p>
 
 <a class="btn btn-info" href="{{url_for('update_profile_form')}}">Update Profile Information</a>
+<a class="btn btn-warning" href="{{url_for('update_password')}}">Update Password</a>
 
 <h4 class="display-4">Current Location:</h4>
 {% if (not g.user.location_lat) and (not g.user.location_long) %}
