@@ -224,8 +224,7 @@ def create_app(db_name, testing=False):
             return render_template("home.html")
         else:
             return render_template("home_anon.html")
-
-
+    
     ##############################################################################
     # Turn off all caching in Flask
     #   (useful for dev; in production, this kind of stuff is typically

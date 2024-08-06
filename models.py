@@ -23,10 +23,7 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     
     # Once logged in, users can set their address which will be converted into longitude and latitude for restaurant lookup.
-    address_street = db.Column(db.Text)
-    address_city = db.Column(db.Text)
-    address_state = db.Column(db.String(2))
-    address_zip = db.Column(db.String(5))
+    address_zip = db.Column(db.Integer)
     location_lat = db.Column(db.Float)
     location_long = db.Column(db.Float)
 
