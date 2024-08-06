@@ -6,6 +6,7 @@
 <div class="row justify-content-md-center">
     <div class="col-md-4">
       <h2 class="display-2">Change Your Location Below.</h2>
+      <p>Current path: {{g.current_url}}</p>
       <form method="POST">
         {{ form.hidden_tag() }}
 
@@ -20,7 +21,7 @@
         {% endfor %}
 
         <button class="btn btn-success">Update Location</button>
-        <a href="{{url_for('show_profile_info')}}" class="btn btn-outline-secondary">Cancel</a>
+        <a href="{{g.back_url}}" class="btn btn-outline-secondary">Cancel</a>
       </form>
     </div>
   </div>

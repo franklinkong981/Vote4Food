@@ -14,6 +14,8 @@ from models import db, connect_db, User, Restaurant, Item, Restaurant_Review, It
 """This key will be in the Flask session and contain the logged in user's id once a user successfully logs in, will be removed once a user
 successfully logs out."""
 CURRENT_USER_KEY = "logged_in_user"
+GO_BACK_URL = "back_url"
+
 GEOLOCATION_API_URL = "http://api.positionstack.com/v1/forward"
 
 def create_app(db_name, testing=False):
@@ -50,6 +52,15 @@ def create_app(db_name, testing=False):
         else:
             g.user = None
     
+    @app.before_request
+    def add_back_url_to_g_object():
+        """This adds the URL to the g object so that submission of the update location form takes user to the page they previously visited."""
+
+        if GO_BACK_URL in session:
+            g.back_url = session[GO_BACK_URL]
+        else:
+            g.back_url = None
+    
     def login_user(user):
         """Add user's id to the Flask session to indicate that this user is currently logged in."""
 
@@ -70,7 +81,7 @@ def create_app(db_name, testing=False):
             return None
         
         address_data = response.json()['data'][0]
-        return {'longitude': int(address_data['longitude']), 'latitude': int(address_data['latitude'])}
+        return {'longitude': float(address_data['longitude']), 'latitude': float(address_data['latitude'])}
 
 
     ##############################################################################
@@ -169,6 +180,10 @@ def create_app(db_name, testing=False):
             flash("Please sign in to view your profile information", "danger")
             return redirect("/")
         
+        # There are multiple pages where you can access the update location form. This is to store the current url so user can easily
+        # go back to the page they came from if they decide not to update their location.
+        session[GO_BACK_URL] = request.path
+        
         return render_template("/users/profile.html")
 
     @app.route('/users/profile/update', methods=['GET', 'POST'])
@@ -257,12 +272,17 @@ def create_app(db_name, testing=False):
                 g.user.location_lat = address_coords['latitude']
                 g.user.location_long = address_coords['longitude']
                 db.session.commit()
+
+                flash("Location successfully updated!", "success")
+                if not g.back_url:
+                    return redirect("/")
+                return redirect(g.back_url)
             except IndexError as exc:
                 flash("Unable to update location, the zip code you entered is not a registered US postal code. Please try again.", "danger")
                 print(f"ERROR: {exc}")
             except:
-                # Issue with connecting to SQLAlchemy database.
-                flash("There was an error in connecting/accessing the database. Please try again later.", "danger")
+                # Issue with connecting to SQLAlchemy database or Geoloation API.
+                flash("There was an error in connecting/accessing the database/geolocation API. Please try again later.", "danger")
         
         return render_template("users/edit_location.html", form=form)
 
@@ -274,6 +294,10 @@ def create_app(db_name, testing=False):
     def homepage():
         """If user is logged in, show logged in homepage. If user is logged out, show logged out homepage."""
         if g.user:
+            # There are multiple pages where you can access the update location form. This is to store the current url so user can easily
+            # go back to the page they came from if they decide not to update their location.
+            session[GO_BACK_URL] = request.path
+
             return render_template("home.html")
         else:
             return render_template("home_anon.html")
