@@ -3,7 +3,7 @@ for increased security."""
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, TextAreaField, SelectField, IntegerField
-from wtforms.validators import DataRequired, Email, Length, Optional
+from wtforms.validators import DataRequired, NumberRange, Email, Length, Optional
 
 class SignUpForm(FlaskForm):
     """Defines the form for user signup when creating a new account. Users will input their first name, last name, email, password,
@@ -36,5 +36,11 @@ class ChangePasswordForm(FlaskForm):
 
     current_password = PasswordField('Current Password:', validators=[DataRequired(message="You must provide your current password!")])
     new_password = PasswordField('New Password:', validators=[DataRequired(message="You must provide a new password!"), Length(min=8,message="Your new password must be at least 8 characters long!")])
+
+class SetLocationForm(FlaskForm):
+    """Defines the form displayed on the profile page where a user can set their current location/address by entering a 5-digit US postal code.
+    The approximate latitude and longitude based on the zip code will be calculated on form submission."""
+
+    address_zip = IntegerField('Zip code (first 5 digits):', validators=[DataRequired(message="You must enter a zip code to set your location!"), NumberRange(min=10000, max=99999, message="Your zip code must be 5 digits long!")])
 
 
