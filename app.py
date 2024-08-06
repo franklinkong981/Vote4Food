@@ -6,13 +6,15 @@ import os
 from flask import Flask, render_template, request, flash, redirect, session, g
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
+import requests
 
-from forms import SignUpForm, LoginForm, EditProfileForm, ChangePasswordForm
+from forms import SignUpForm, LoginForm, EditProfileForm, ChangePasswordForm, SetLocationForm
 from models import db, connect_db, User, Restaurant, Item, Restaurant_Review, Item_Review, Restaurant_Favorite, Item_Favorite
 
 """This key will be in the Flask session and contain the logged in user's id once a user successfully logs in, will be removed once a user
 successfully logs out."""
 CURRENT_USER_KEY = "logged_in_user"
+GEOLOCATION_API_URL = "http://api.positionstack.com/v1/forward"
 
 def create_app(db_name, testing=False):
     """Create an instance of the app to ensure separate production database and testing database, and that sample data inserted into
@@ -36,7 +38,8 @@ def create_app(db_name, testing=False):
     #Routes and view functions for the application.
 
     ##############################################################################
-    # Functions for user login/logout, as well as convenient access to logged in user information.
+    # Non-route functions, aka functions to be executed before/after each request, or functions that handle API calls, manipualate
+    # caches, etc.
 
     @app.before_request
     def add_user_to_g_object():
@@ -56,6 +59,22 @@ def create_app(db_name, testing=False):
         """Remove the previously logged in user's id from the Flask session to indicate no user is currently logged in."""
 
         del session[CURRENT_USER_KEY]
+    
+    def get_address_info(zip_code):
+        """Calls the Position Stack Geolocation API which converts the zip_code into an address object that contains information like
+        longitude, latitude, region, etc. Returns the long/lat coordinates in the most relevant/first address object found or None if 
+        no results are found."""
+
+        response = requests.get(GEOLOCATION_API_URL, params={"access_key": os.environ.get('POSITION_STACK_API_KEY'), "query": str(zip_code)})
+        if len(response.json()['data']) == 0:
+            return None
+        
+        address_data = response.json()['data'][0]
+        return {'longitude': int(address_data['longitude']), 'latitude': int(address_data['latitude'])}
+
+
+    ##############################################################################
+    # Functions for user login/logout, as well as convenient access to logged in user information.
     
     @app.route('/signup', methods=['GET', 'POST'])
     def handle_signup():
@@ -214,6 +233,40 @@ def create_app(db_name, testing=False):
                 flash("The current password you entered does not match the current password associated with your account", "danger")
         
         return render_template("users/edit_password.html", form=form)
+    
+    @app.route('/users/profile/update_location', methods=['GET', 'POST'])
+    def update_location():
+        """Show the form that allows the logged in user to update their location by entering their 5-digit zip code. The zip code will then
+        be transformed into latitude and longitude coordinates"""
+
+        if not g.user:
+            flash("Please sign in to update your location", "danger")
+            return redirect("/")
+        
+        form = SetLocationForm()
+        if form.validate_on_submit():
+            try:
+                # Use Position Stack Geolocation API to turn zip code from form into latitude and longitude.
+                zip_code = form.address_zip.data
+                address_coords = get_address_info(zip_code)
+                if not address_coords:
+                    raise IndexError("The zip code you entered is not a registered US zip code.")
+                
+                # Update logged in user's zip code, latitude, and longitude in the database.
+                g.user.address_zip = zip_code
+                g.user.location_lat = address_coords['latitude']
+                g.user.location_long = address_coords['longitude']
+                db.session.commit()
+            except IndexError as exc:
+                flash("Unable to update location, the zip code you entered is not a registered US postal code. Please try again.", "danger")
+                print(f"ERROR: {exc}")
+            except:
+                # Issue with connecting to SQLAlchemy database.
+                flash("There was an error in connecting/accessing the database. Please try again later.", "danger")
+        
+        return render_template("users/edit_location.html", form=form)
+
+
 
 
     ##############################################################################
