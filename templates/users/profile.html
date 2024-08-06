@@ -18,12 +18,15 @@
 <a class="btn btn-info" href="{{url_for('update_profile_form')}}">Update Profile Information</a>
 <a class="btn btn-warning" href="{{url_for('update_password')}}">Update Password</a>
 
-<h4 class="display-4">Current Location:</h4>
 {% if (not g.user.location_lat) and (not g.user.location_long) %}
     <p>You do not yet have a current location.</p>
-    <a class="btn btn-warning" href="#">Set current location.</a>
+    <a class="btn btn-warning" href="{{url_for('update_location')}}">Set current location.</a>
 {% else %}
-    <p>Congrats! You have a location!</p>
+    <p>Your current location:</p>
+    <p>Zip: {{g.user.address_zip}}</p>
+    <p>Longitude: {{g.user.location_long}}</p>
+    <p>Latitude: {{g.user.location_lat}}</p>
+    <a class="btn btn-warning" href="{{url_for('update_location')}}">Update current location.</a>
 {% endif %}
 
 {% endblock %}
