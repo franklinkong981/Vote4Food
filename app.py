@@ -323,6 +323,29 @@ def create_app(db_name, testing=False):
             'photo_url': get_restaurant_photo_url(restaurant)
         }
         CURRENT_RESTAURANT_SEARCH_RESULTS.append(restaurant_data)
+    
+    def add_new_restaurants(restaurants):
+        """Add all new restaurants from search results into the Restaurant database."""
+        
+        for restaurant in restaurants:
+            add_new_restaurant(restaurant)
+    
+    def add_new_restaurant(restaurant):
+        """Search for the restaurant by id in the Vouch4Food Restaurant database. If not found, add it to the database."""
+
+        database_restaurant = Restaurant.query.get(restaurant['id'])
+
+        if not database_restaurant:
+            new_restaurant = Restaurant(
+                id = restaurant['id'],
+                name = restaurant['name'],
+                address = restaurant['address'],
+                description = restaurant['description'],
+                photo_url = restaurant['photo_url'],
+                location_lat = restaurant['latitude'],
+                location_long = restaurant['longitude']
+            )
+            db.session.add(new_restaurant)
 
 
     @app.route("/restaurants/add", methods=["POST"])
@@ -330,7 +353,7 @@ def create_app(db_name, testing=False):
         """This route consists of 4 steps:
         1. Calls the PositionStack API to return a longitude and latitude corresponding to the zip code the user typed in.
         2. Calls the Spoonacular API to search for all restaurants that match the search query and are located near the zip code.
-        3. Extracts several pieces of useful information from each restaurant object in the JSON response to be stored in the Flask session.
+        3. Extracts several pieces of useful information from each restaurant object in the JSON response and store them.
         4. Adds each restaurant whose id isn't found in the database into the vouch4Food database as a Restaurant object."""
         
         if not g.user:
@@ -350,6 +373,10 @@ def create_app(db_name, testing=False):
             store_restaurant_search_results(restaurants_data)
 
             # Step 4
+            add_new_restaurants(CURRENT_RESTAURANT_SEARCH_RESULTS)
+            db.session.commit()
+
+            flash("Search successful, new restaurants successfully added to database","success")
             return redirect("/restaurants")
         except ValueError as exc:
             flash("The zip code you entered is not a registered US postal code. Please try again.", "danger")
