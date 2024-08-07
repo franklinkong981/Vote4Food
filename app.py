@@ -300,6 +300,7 @@ def create_app(db_name, testing=False):
         """Extract the important information about each restaurant in the most recent restaurant search results such as opening hours,
         name, etc. and store them in the Flask session for persistence."""
 
+        session[CURRENT_RESTAURANT_SEARCH_RESULTS] = []
         
 
     @app.route("/restaurants/add", methods=["POST"])

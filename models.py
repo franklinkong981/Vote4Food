@@ -110,6 +110,9 @@ class Restaurant(db.Model):
     store_photo_url = db.Column(db.Text)
     logo_photo_url = db.Column(db.Text, default="vote4food_default")
 
+    location_lat = db.Column(db.Float)
+    location_long = db.Column(db.Float)
+
     # Relationships to link a restaurant location to the list of reviews and favorites for it.
     reviews = db.relationship('Restaurant_Review', cascade='all, delete', backref='restaurant')
     favorites = db.relationship('Restaurant_Favorite', cascade='all, delete', backref='restaurant')
