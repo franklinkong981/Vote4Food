@@ -106,7 +106,7 @@ class Restaurant(db.Model):
     name = db.Column(db.Text, nullable=False)
     address = db.Column(db.Text)
     description = db.Column(db.Text)
-    photo_url = db.Column(db.Text, default="vote4food_default")
+    photo_url = db.Column(db.Text, default="/static/images/default-restaurant-image.jpg")
 
     location_lat = db.Column(db.Float)
     location_long = db.Column(db.Float)
@@ -124,7 +124,7 @@ class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.Text, nullable=False)
     restaurant_chain = db.Column(db.Text)
-    image_url = db.Column(db.Text, default="vote4food_default")
+    image_url = db.Column(db.Text, default="/static/images/default-menu-item-image.jpg")
 
     # Relationships to link a menu item to the list of reviews and favorites for it.
     reviews = db.relationship('Item_Review', cascade='all, delete', backref='item')

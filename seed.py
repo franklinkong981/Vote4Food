@@ -2,13 +2,13 @@
 or connect to online Supabase database."""
 
 import os
-from app import db, app
+from app import create_app
 from models import db, connect_db, User, Restaurant, Item, Restaurant_Review, Item_Review, Restaurant_Favorite, Item_Favorite
 from dotenv import load_dotenv
 
 load_dotenv()
 # app = create_app('warbler')
-# app = create_app('vouch4food')
+app = create_app('vouch4food')
 print("The database is: ", os.environ.get('DATABASE_URL'))
 connect_db(app)
 app.app_context().push()
