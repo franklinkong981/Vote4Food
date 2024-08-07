@@ -106,9 +106,7 @@ class Restaurant(db.Model):
     name = db.Column(db.Text, nullable=False)
     address = db.Column(db.Text)
     description = db.Column(db.Text)
-    cuisines = db.Column(db.Text)
-    store_photo_url = db.Column(db.Text)
-    logo_photo_url = db.Column(db.Text, default="vote4food_default")
+    photo_url = db.Column(db.Text, default="vote4food_default")
 
     location_lat = db.Column(db.Float)
     location_long = db.Column(db.Float)

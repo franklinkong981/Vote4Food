@@ -10,6 +10,7 @@ import requests
 
 from forms import SignUpForm, LoginForm, EditProfileForm, ChangePasswordForm, SetLocationForm, SearchRestaurantForm
 from models import db, connect_db, User, Restaurant, Item, Restaurant_Review, Item_Review, Restaurant_Favorite, Item_Favorite
+from helpers import build_restaurant_address_string, build_restaurant_cuisine_string, format_phone_number, get_restaurant_photo_url
 
 """This key will be in the Flask session and contain the logged in user's id once a user successfully logs in, will be removed once a user
 successfully logs out."""
@@ -296,12 +297,35 @@ def create_app(db_name, testing=False):
         restaurants_data = restaurants_response.json()["restaurants"]
         return restaurants_data
     
-    def store_restaurant_search_results(restaurants):
+    def store_restaurants_to_session(restaurants):
         """Extract the important information about each restaurant in the most recent restaurant search results such as opening hours,
         name, etc. and store them in the Flask session for persistence."""
 
         session[CURRENT_RESTAURANT_SEARCH_RESULTS] = []
-        
+        for restaurant in restaurants:
+            add_restaurant_to_session(restaurant)
+    
+    def add_restaurant_to_session(restaurant):
+        """restaurant is a JSON Restaurant object returned from the Spoonacular API. This function extracts the useful data from it,
+        processes them into more readable formats, and adds them to the Flask session as an object."""
+
+        if CURRENT_RESTAURANT_SEARCH_RESULTS not in session:
+            session[CURRENT_RESTAURANT_SEARCH_RESULTS] = []
+
+        restaurant_data = {
+            'id': restaurant['_id'],
+            'name': restaurant['name'],
+            'address': build_restaurant_address_string(restaurant['address']),
+            'latitude': restaurant['address']['latitude'],
+            'longitude': restaurant['address']['longitude'],
+            'cuisines': build_restaurant_cuisine_string(restaurant["cuisines"]),
+            'description': restaurant["description"] or None,
+            'phone': format_phone_number(restaurant["phone_number"]),
+            'hours': restaurant['local_hours']['operational'] or None,
+            'photo_url': get_restaurant_photo_url(restaurant)
+        }
+        session[CURRENT_RESTAURANT_SEARCH_RESULTS].append(restaurant_data)
+
 
     @app.route("/restaurants/add", methods=["POST"])
     def add_restaurants_to_db():
@@ -325,24 +349,24 @@ def create_app(db_name, testing=False):
             restaurants_data = get_restaurant_search_results(search_term, coords['latitude'], coords['longitude'])
 
             # Step 3
+            store_restaurants_to_session(restaurants_data)
 
+            # Step 4
+            return redirect("/restaurants")
         except ValueError as exc:
             flash("The zip code you entered is not a registered US postal code. Please try again.", "danger")
             print(f"ERROR: {exc}")
         except:
+            flash("There was trouble connecting to the database and/or the PositionStack and Spoonacular APIs. Please try again later", "danger")
+        
+        redirect_url = request.referrer or "/"
+        return redirect(redirect_url)
 
 
     @app.route("/restaurants")
     def show_restaurant_search_results():
-        search_term = request.args.get('query')
-        zip_code = request.args.get('zip_code')
 
-        coords = get_address_info(zip_code)
-        restaurants_response = requests.get(SPOONACULAR_RESTAURANT_SEARCH_URL, params={"apiKey": os.environ.get('SPOONACULAR_API_KEY'), "query": "", "lat": coords['latitude'], "lng": coords['longitude'], "distance": 5, "sort": "distance"})
-        restaurant_data = restaurants_response.json()["restaurants"]
-        restaurant_names = [restaurant["name"] for restaurant in restaurant_data]
-
-        return render_template('/restaurants/search.html', restaurant_names=restaurant_names)
+        return render_template('/restaurants/search.html')
 
     ##############################################################################
     @app.route('/')
