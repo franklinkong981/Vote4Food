@@ -3,10 +3,31 @@
 {% block title %} Vouch4Food - Change Location {% endblock %}
 
 {% block content %}
-<h2 class="display-2">Search Results:</h2>
+<h2 class="display-2">Search Results: {{number_results}} results</h2>
 
-{% for name in restaurant_names %}
-    <p>{{name}}</p>
+{% for restaurant in restaurant_results %}
+    <p>Name: {{restaurant['name']}}</p>
+    <p>Address: {{restaurant['address'] or "N/A"}}</p>
+    <p>Latitude: {{restaurant['latitude']}}</p>
+    <p>Longitude: {{restaurant['longitude']}}</p>
+    <p>Cuisines: {{restaurant['cuisines'] or "N/A"}}</p>
+    <p>Description: {{restaurant['description'] or "N/A"}}</p>
+    <p>Phone Number: {{restaurant['phone'] or "N/A"}}</p>
+    <p>Hours:</p>
+    <ul>
+        <li>Monday: {{restaurant['hours']['Monday'] or "N/A"}}</li>
+        <li>Tuesday: {{restaurant['hours']['Tuesday'] or "N/A"}}</li>
+        <li>Wednesday: {{restaurant['hours']['Wednesday'] or "N/A"}}</li>
+        <li>Thursday: {{restaurant['hours']['Thursday'] or "N/A"}}</li>
+        <li>Friday: {{restaurant['hours']['Friday'] or "N/A"}}</li>
+        <li>Saturday: {{restaurant['hours']['Saturday'] or "N/A"}}</li>
+        <li>Sunday: {{restaurant['hours']['Sunday'] or "N/A"}}</li>
+    </ul>
+    {% if restaurant['photo_url'] %}
+        <img src="{{restaurant['photo_url']}}" alt="Photo of {{restaurant['name']}}"/>
+    {% endif %}
+
+    <hr>
 {% endfor %}
 
 {% endblock %}

@@ -16,7 +16,6 @@ from helpers import build_restaurant_address_string, build_restaurant_cuisine_st
 successfully logs out."""
 CURRENT_USER_KEY = "logged_in_user"
 GO_BACK_URL = "back_url"
-CURRENT_RESTAURANT_SEARCH_RESULTS = "current_restaurant_search_results"
 
 GEOLOCATION_API_URL = "http://api.positionstack.com/v1/forward"
 SPOONACULAR_RESTAURANT_SEARCH_URL = "https://api.spoonacular.com/food/restaurants/search"
@@ -289,28 +288,27 @@ def create_app(db_name, testing=False):
     ##############################################################################
     # Routes relevant to searching for restaurants, mainly through the restaurant search bar in the navbar.
 
+    CURRENT_RESTAURANT_SEARCH_RESULTS = []
+
     def get_restaurant_search_results(search_query, latitude, longitude):
         """Calls the Spoonacular API Restaurant Search route and returns the list of restaurant JSON objects that match the search
         query and are located near the latitude and longitude."""
 
-        restaurants_response = requests.get(SPOONACULAR_RESTAURANT_SEARCH_URL, params={"apiKey": os.environ.get('SPOONACULAR_API_KEY'), "query": search_query, "lat": float(latitude), "lng": float(longitude), "distance": 5})
+        restaurants_response = requests.get(SPOONACULAR_RESTAURANT_SEARCH_URL, params={"apiKey": os.environ.get('SPOONACULAR_API_KEY'), "query": search_query, "lat": latitude, "lng": longitude, "distance": 5})
         restaurants_data = restaurants_response.json()["restaurants"]
         return restaurants_data
     
-    def store_restaurants_to_session(restaurants):
+    def store_restaurant_search_results(restaurants):
         """Extract the important information about each restaurant in the most recent restaurant search results such as opening hours,
-        name, etc. and store them in the Flask session for persistence."""
+        name, etc. and store them in an array."""
 
-        session[CURRENT_RESTAURANT_SEARCH_RESULTS] = []
+        CURRENT_RESTAURANT_SEARCH_RESULTS = []
         for restaurant in restaurants:
-            add_restaurant_to_session(restaurant)
+            add_restaurant_search_result(restaurant)
     
-    def add_restaurant_to_session(restaurant):
+    def add_restaurant_search_result(restaurant):
         """restaurant is a JSON Restaurant object returned from the Spoonacular API. This function extracts the useful data from it,
-        processes them into more readable formats, and adds them to the Flask session as an object."""
-
-        if CURRENT_RESTAURANT_SEARCH_RESULTS not in session:
-            session[CURRENT_RESTAURANT_SEARCH_RESULTS] = []
+        processes them into more readable formats, and appends it to an array that stores all search results."""
 
         restaurant_data = {
             'id': restaurant['_id'],
@@ -324,7 +322,7 @@ def create_app(db_name, testing=False):
             'hours': restaurant['local_hours']['operational'] or None,
             'photo_url': get_restaurant_photo_url(restaurant)
         }
-        session[CURRENT_RESTAURANT_SEARCH_RESULTS].append(restaurant_data)
+        CURRENT_RESTAURANT_SEARCH_RESULTS.append(restaurant_data)
 
 
     @app.route("/restaurants/add", methods=["POST"])
@@ -341,15 +339,15 @@ def create_app(db_name, testing=False):
         
         try:
             # Step 1
-            zip_code = request.args.get('zip_code')
+            zip_code = request.form['zip_code']
             coords = get_address_info(zip_code)
 
             # Step 2
-            search_term = request.args.get('query')
+            search_term = request.form['query']
             restaurants_data = get_restaurant_search_results(search_term, coords['latitude'], coords['longitude'])
 
             # Step 3
-            store_restaurants_to_session(restaurants_data)
+            store_restaurant_search_results(restaurants_data)
 
             # Step 4
             return redirect("/restaurants")
@@ -366,7 +364,7 @@ def create_app(db_name, testing=False):
     @app.route("/restaurants")
     def show_restaurant_search_results():
 
-        return render_template('/restaurants/search.html')
+        return render_template('/restaurants/search.html', number_results=len(CURRENT_RESTAURANT_SEARCH_RESULTS), restaurant_results=CURRENT_RESTAURANT_SEARCH_RESULTS)
 
     ##############################################################################
     @app.route('/')
