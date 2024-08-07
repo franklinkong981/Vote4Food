@@ -15,6 +15,7 @@ from models import db, connect_db, User, Restaurant, Item, Restaurant_Review, It
 successfully logs out."""
 CURRENT_USER_KEY = "logged_in_user"
 GO_BACK_URL = "back_url"
+CURRENT_RESTAURANT_SEARCH_RESULTS = "current_restaurant_search_results"
 
 GEOLOCATION_API_URL = "http://api.positionstack.com/v1/forward"
 SPOONACULAR_RESTAURANT_SEARCH_URL = "https://api.spoonacular.com/food/restaurants/search"
@@ -74,13 +75,12 @@ def create_app(db_name, testing=False):
     
     def get_address_info(zip_code):
         """Calls the Position Stack Geolocation API which converts the zip_code into an address object that contains information like
-        longitude, latitude, region, etc. Returns the long/lat coordinates in the most relevant/first address object found or None if 
-        no results are found."""
+        longitude, latitude, region, etc. Returns the long/lat coordinates in the most relevant/first address object found and raises 
+        an error if no results are found."""
 
         response = requests.get(GEOLOCATION_API_URL, params={"access_key": os.environ.get('POSITION_STACK_API_KEY'), "query": str(zip_code)})
         if len(response.json()['data']) == 0:
-            return None
-        
+            raise ValueError("The zip code you entered is not a registered US zip code.")
         address_data = response.json()['data'][0]
         return {'longitude': float(address_data['longitude']), 'latitude': float(address_data['latitude'])}
 
@@ -265,8 +265,6 @@ def create_app(db_name, testing=False):
                 # Use Position Stack Geolocation API to turn zip code from form into latitude and longitude.
                 zip_code = form.address_zip.data
                 address_coords = get_address_info(zip_code)
-                if not address_coords:
-                    raise IndexError("The zip code you entered is not a registered US zip code.")
                 
                 # Update logged in user's zip code, latitude, and longitude in the database.
                 g.user.address_zip = zip_code
@@ -278,7 +276,7 @@ def create_app(db_name, testing=False):
                 if not g.back_url:
                     return redirect("/")
                 return redirect(g.back_url)
-            except IndexError as exc:
+            except ValueError as exc:
                 flash("Unable to update location, the zip code you entered is not a registered US postal code. Please try again.", "danger")
                 print(f"ERROR: {exc}")
             except:
@@ -289,6 +287,17 @@ def create_app(db_name, testing=False):
 
     ##############################################################################
     # Routes relevant to searching for restaurants, mainly through the restaurant search bar in the navbar.
+
+    @app.route("/restaurants/add", methods=["POST"])
+    def add_restaurants_to_db():
+        """This route consists of 4 steps:
+        1. Calls the PositionStack API to return a longitude and latitude corresponding to the zip code the user typed in.
+        2. Calls the Spoonacular API to search for all restaurants that match the search query and are located near the zip code.
+        3. Extracts several pieces of useful information from each restaurant object in the JSON response to be stored in the Flask session.
+        4. Adds each restaurant whose id isn't found in the database into the vouch4Food database as a Restaurant object."""
+
+
+
 
     @app.route("/restaurants")
     def show_restaurant_search_results():

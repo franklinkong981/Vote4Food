@@ -22,7 +22,7 @@
                 <a class="btn btn-primary" href="{{url_for('homepage')}}">Home</a>
                 <a class="btn btn-secondary" href="{{url_for('show_profile_info')}}">Profile Information</a>
 
-                <form action="{{url_for('show_restaurant_search_results')}}">
+                <form action="{{url_for('add_restaurants_to_db')}}", method="post">
                     <label for="search-field">Search: </label>
                     <input type="text" class="form-control" id="search-field" name="query" placeholder="Ex. burger" required>
                     <label for="zip-code-field">Zip code (5 digits): </label>
