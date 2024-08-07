@@ -22,7 +22,21 @@
                 <a class="btn btn-primary" href="{{url_for('homepage')}}">Home</a>
                 <a class="btn btn-secondary" href="{{url_for('show_profile_info')}}">Profile Information</a>
 
-                
+                <form method="POST">
+                    {{ search_restaurant_form.hidden_tag() }}
+            
+                    {% for field in search_restaurant_form if field.widget.input_type != 'hidden' %}
+                      {% for error in field.errors %}
+                        <span class="text-danger">{{ error }}</span>
+                      {% endfor %}
+                      <div class="form-group">
+                        {{field.label}}
+                        {{field(class_="form-control")}}
+                      </div>
+                    {% endfor %}
+            
+                    <button class="btn btn-info">Search Restaurants Nearby</button>
+                </form>
 
                 <a class="btn btn-dark" href="{{url_for('handle_logout')}}">Log Out</a>
             {% endif %}

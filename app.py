@@ -8,7 +8,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 import requests
 
-from forms import SignUpForm, LoginForm, EditProfileForm, ChangePasswordForm, SetLocationForm
+from forms import SignUpForm, LoginForm, EditProfileForm, ChangePasswordForm, SetLocationForm, SearchRestaurantForm
 from models import db, connect_db, User, Restaurant, Item, Restaurant_Review, Item_Review, Restaurant_Favorite, Item_Favorite
 
 """This key will be in the Flask session and contain the logged in user's id once a user successfully logs in, will be removed once a user
@@ -70,6 +70,13 @@ def create_app(db_name, testing=False):
         """Remove the previously logged in user's id from the Flask session to indicate no user is currently logged in."""
 
         del session[CURRENT_USER_KEY]
+    
+    @app.context_processor
+    def add_common_template_variables():
+        """Add variables such as the restaurant search bar that can then be used in all templates."""
+
+        search_restaurant_form = SearchRestaurantForm()
+        return dict(search_restaurant_form=search_restaurant_form)
     
     def get_address_info(zip_code):
         """Calls the Position Stack Geolocation API which converts the zip_code into an address object that contains information like
