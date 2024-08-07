@@ -288,6 +288,20 @@ def create_app(db_name, testing=False):
     ##############################################################################
     # Routes relevant to searching for restaurants, mainly through the restaurant search bar in the navbar.
 
+    def get_restaurant_search_results(search_query, latitude, longitude):
+        """Calls the Spoonacular API Restaurant Search route and returns the list of restaurant JSON objects that match the search
+        query and are located near the latitude and longitude."""
+
+        restaurants_response = requests.get(SPOONACULAR_RESTAURANT_SEARCH_URL, params={"apiKey": os.environ.get('SPOONACULAR_API_KEY'), "query": search_query, "lat": float(latitude), "lng": float(longitude), "distance": 5})
+        restaurants_data = restaurants_response.json()["restaurants"]
+        return restaurants_data
+    
+    def store_restaurant_search_results(restaurants):
+        """Extract the important information about each restaurant in the most recent restaurant search results such as opening hours,
+        name, etc. and store them in the Flask session for persistence."""
+
+        
+
     @app.route("/restaurants/add", methods=["POST"])
     def add_restaurants_to_db():
         """This route consists of 4 steps:
@@ -295,8 +309,26 @@ def create_app(db_name, testing=False):
         2. Calls the Spoonacular API to search for all restaurants that match the search query and are located near the zip code.
         3. Extracts several pieces of useful information from each restaurant object in the JSON response to be stored in the Flask session.
         4. Adds each restaurant whose id isn't found in the database into the vouch4Food database as a Restaurant object."""
+        
+        if not g.user:
+            flash("Please sign in to search for restaurants", "danger")
+            return redirect("/")
+        
+        try:
+            # Step 1
+            zip_code = request.args.get('zip_code')
+            coords = get_address_info(zip_code)
 
+            # Step 2
+            search_term = request.args.get('query')
+            restaurants_data = get_restaurant_search_results(search_term, coords['latitude'], coords['longitude'])
 
+            # Step 3
+
+        except ValueError as exc:
+            flash("The zip code you entered is not a registered US postal code. Please try again.", "danger")
+            print(f"ERROR: {exc}")
+        except:
 
 
     @app.route("/restaurants")
