@@ -14,13 +14,16 @@
         {% endfor %}
 
         <div class="auth-navbar">
-            <h2 class="display-2">{{g.user.get_full_name()}}</h2>
-            <a class="btn btn-primary" href="{{url_for('homepage')}}">Home</a>
-            <a class="btn btn-secondary" href="{{url_for('show_profile_info')}}">Profile Information</a>
             {% if not g.user %}
                 <a class="btn btn-primary" href="{{url_for('handle_signup')}}">Sign Up</a>
                 <a class="btn btn-primary" href="{{url_for('handle_login')}}">Log In</a>
             {% else %}
+                <h2 class="display-2">{{g.user.get_full_name()}}</h2>
+                <a class="btn btn-primary" href="{{url_for('homepage')}}">Home</a>
+                <a class="btn btn-secondary" href="{{url_for('show_profile_info')}}">Profile Information</a>
+
+                
+
                 <a class="btn btn-dark" href="{{url_for('handle_logout')}}">Log Out</a>
             {% endif %}
         </div>

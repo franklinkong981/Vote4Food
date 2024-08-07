@@ -43,4 +43,10 @@ class SetLocationForm(FlaskForm):
 
     address_zip = IntegerField('Zip code (first 5 digits):', validators=[DataRequired(message="You must enter a zip code to set your location!"), NumberRange(min=10000, max=99999, message="Your zip code must be 5 digits long!")])
 
+class SearchRestaurantForm(FlaskForm):
+    """Defines the search bar that appears on the navbar so that the logged in user can search for restaurants that match a specific term
+    near a specific zip code."""
+
+    query = StringField("Search for restaurants", validators=[DataRequired(message="You must provide a search query to search for restaurants!"), Length(max=100, message="Your search query can't be more than 100 characters long!")])
+    zip_code = IntegerField('Zip code (5 digits):', validators=[DataRequired(message="You must enter a zip code to search for restaurants!"), NumberRange(min=10000, max=99999, message="Your zip code must be 5 digits long!")])
 
