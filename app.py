@@ -17,6 +17,7 @@ CURRENT_USER_KEY = "logged_in_user"
 GO_BACK_URL = "back_url"
 
 GEOLOCATION_API_URL = "http://api.positionstack.com/v1/forward"
+SPOONACULAR_RESTAURANT_SEARCH_URL = "https://api.spoonacular.com/food/restaurants/search"
 
 def create_app(db_name, testing=False):
     """Create an instance of the app to ensure separate production database and testing database, and that sample data inserted into
@@ -70,13 +71,6 @@ def create_app(db_name, testing=False):
         """Remove the previously logged in user's id from the Flask session to indicate no user is currently logged in."""
 
         del session[CURRENT_USER_KEY]
-    
-    @app.context_processor
-    def add_common_template_variables():
-        """Add variables such as the restaurant search bar that can then be used in all templates."""
-
-        search_restaurant_form = SearchRestaurantForm()
-        return dict(search_restaurant_form=search_restaurant_form)
     
     def get_address_info(zip_code):
         """Calls the Position Stack Geolocation API which converts the zip_code into an address object that contains information like
@@ -293,8 +287,20 @@ def create_app(db_name, testing=False):
         
         return render_template("users/edit_location.html", form=form)
 
+    ##############################################################################
+    # Routes relevant to searching for restaurants, mainly through the restaurant search bar in the navbar.
 
+    @app.route("/restaurants")
+    def show_restaurant_search_results():
+        search_term = request.args.get('query')
+        zip_code = request.args.get('zip_code')
 
+        coords = get_address_info(zip_code)
+        restaurants_response = requests.get(SPOONACULAR_RESTAURANT_SEARCH_URL, params={"apiKey": os.environ.get('SPOONACULAR_API_KEY'), "query": "", "lat": coords['latitude'], "lng": coords['longitude'], "distance": 5, "sort": "distance"})
+        restaurant_data = restaurants_response.json()["restaurants"]
+        restaurant_names = [restaurant["name"] for restaurant in restaurant_data]
+
+        return render_template('/restaurants/search.html', restaurant_names=restaurant_names)
 
     ##############################################################################
     @app.route('/')

@@ -22,20 +22,12 @@
                 <a class="btn btn-primary" href="{{url_for('homepage')}}">Home</a>
                 <a class="btn btn-secondary" href="{{url_for('show_profile_info')}}">Profile Information</a>
 
-                <form method="POST">
-                    {{ search_restaurant_form.hidden_tag() }}
-            
-                    {% for field in search_restaurant_form if field.widget.input_type != 'hidden' %}
-                      {% for error in field.errors %}
-                        <span class="text-danger">{{ error }}</span>
-                      {% endfor %}
-                      <div class="form-group">
-                        {{field.label}}
-                        {{field(class_="form-control")}}
-                      </div>
-                    {% endfor %}
-            
-                    <button class="btn btn-info">Search Restaurants Nearby</button>
+                <form action="{{url_for('show_restaurant_search_results')}}">
+                    <label for="search-field">Search: </label>
+                    <input type="text" class="form-control" id="search-field" name="query" placeholder="Ex. burger" required>
+                    <label for="zip-code-field">Zip code (5 digits): </label>
+                    <input type="number" class="form-control" id="zip-code-field" name="zip_code" min="10000" max="99999">
+                    <button class="btn btn-light">Search for Restaurants</button>
                 </form>
 
                 <a class="btn btn-dark" href="{{url_for('handle_logout')}}">Log Out</a>

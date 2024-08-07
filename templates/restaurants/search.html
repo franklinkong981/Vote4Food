@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %} Vouch4Food - Change Location {% endblock %}
+
+{% block content %}
+<h2 class="display-2">Search Results:</h2>
+
+{% for name in restaurant_names %}
+    <p>{{name}}</p>
+{% endfor %}
+
+{% endblock %}
