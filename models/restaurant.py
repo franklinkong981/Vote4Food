@@ -29,6 +29,53 @@ class Restaurant(db.Model):
     friday_hours = db.Column(db.Text)
     saturday_hours = db.Column(db.Text)
 
+    @classmethod
+    def create_restaurant(cls, restaurant):
+        """Adds a new restaurant to the database through a pre-filled restaurant object."""
+
+        new_restaurant = Restaurant(
+            id = restaurant['id'],
+            name = restaurant['name'],
+            address = restaurant['address'],
+            cuisines = restaurant['cuisines'],
+            description = restaurant['description'],
+            phone = restaurant['phone'],
+            photo_url = restaurant['photo_url'],
+            latitude = restaurant['latitude'],
+            longitude = restaurant['longitude'],
+            sunday_hours = restaurant['hours']['Sunday'],
+            monday_hours = restaurant['hours']['Monday'],
+            tuesday_hours = restaurant['hours']['Tuesday'],
+            wednesday_hours = restaurant['hours']['Wednesday'],
+            thursday_hours = restaurant['hours']['Thursday'],
+            friday_hours = restaurant['hours']['Friday'],
+            saturday_hours = restaurant['hours']['Saturday']
+        )
+        db.session.add(new_restaurant)
+    
+    def update_restaurant(self, restaurant):
+        """Updates an existing restaurant in the database by comparing its information to the information in the restaurant object,
+        which contains updated information about that restaurant from the Spoonacualr API."""
+
+        # Only id is guaranteed to be the same, the rest might change.
+
+        if self.name != restaurant['name']: self.name = restaurant['name']
+        if self.address != restaurant['address']: self.address = restaurant['address']
+        if self.cuisines != restaurant['cuisines']: self.cuisines = restaurant['cuisines']
+        if self.description != restaurant['description']: self.description = restaurant['description']
+        if self.phone != restaurant['phone']: self.phone = restaurant['phone']
+        if self.photo_url != restaurant['photo_url']: self.photo_url = restaurant['photo_url']
+        if self.latitude != restaurant['latitude']: self.latitude = restaurant['latitude']
+        if self.longitude != restaurant['longitude']: self.longitude = restaurant['longitude']
+
+        if self.sunday_hours != restaurant['hours']['Sunday']: self.sunday_house = restaurant['hours']['Sunday']
+        if self.monday_hours != restaurant['hours']['Monday']: self.monday_hours = restaurant['hours']['Monday']
+        if self.tuesday_hours != restaurant['hours']['Tuesday']: self.tuesday_hours = restaurant['hours']['Tuesday']
+        if self.wednesday_hours != restaurant['hours']['Wednesday']: self.wednesday_hours = restaurant['hours']['Wednesday']
+        if self.thursday_hours != restaurant['hours']['Thursday']: self.thursday_hours = restaurant['hours']['Thursday']
+        if self.friday_hours != restaurant['hours']['Friday']: self.friday_hours = restaurant['hours']['Friday']
+        if self.saturday_hours != restaurant['hours']['Saturday']: self.saturday_hours = restaurant['hours']['Saturday']
+
     # Relationships to link a restaurant location to the list of reviews and favorites for it.
     reviews = db.relationship('Restaurant_Review', cascade='all, delete', backref='restaurant')
     favorites = db.relationship('Restaurant_Favorite', cascade='all, delete', backref='restaurant')

@@ -291,9 +291,9 @@ def create_app(db_name, testing=False):
 
         CURRENT_RESTAURANT_SEARCH_RESULTS = []
         for restaurant in restaurants:
-            add_restaurant_search_result(restaurant)
+            store_restaurant_search_result(restaurant)
     
-    def add_restaurant_search_result(restaurant):
+    def store_restaurant_search_result(restaurant):
         """restaurant is a JSON Restaurant object returned from the Spoonacular API. This function extracts the useful data from it,
         processes them into more readable formats, and appends it to an array that stores all search results."""
 
@@ -311,28 +311,22 @@ def create_app(db_name, testing=False):
         }
         CURRENT_RESTAURANT_SEARCH_RESULTS.append(restaurant_data)
     
-    def add_new_restaurants(restaurants):
+    def add_new_restaurants_to_db(restaurants):
         """Add all new restaurants from search results into the Restaurant database."""
         
         for restaurant in restaurants:
-            add_new_restaurant(restaurant)
+            add_or_update_new_restaurant(restaurant)
     
-    def add_new_restaurant(restaurant):
-        """Search for the restaurant by id in the Vouch4Food Restaurant database. If not found, add it to the database."""
+    def add_or_update_new_restaurant(restaurant):
+        """Search for the restaurant by id in the Vouch4Food Restaurant database. If not found, add it to the database.
+        If found, check for information to update."""
 
         database_restaurant = Restaurant.query.get(restaurant['id'])
 
         if not database_restaurant:
-            new_restaurant = Restaurant(
-                id = restaurant['id'],
-                name = restaurant['name'],
-                address = restaurant['address'],
-                description = restaurant['description'],
-                photo_url = restaurant['photo_url'],
-                latitude = restaurant['latitude'],
-                longitude = restaurant['longitude']
-            )
-            db.session.add(new_restaurant)
+            Restaurant.create_restaurant(restaurant)
+        else:
+            database_restaurant.update_restaurant(restaurant)
 
 
     @app.route("/restaurants/add", methods=["POST"])
@@ -361,7 +355,7 @@ def create_app(db_name, testing=False):
             store_restaurant_search_results(restaurants_data)
 
             # Step 4
-            add_new_restaurants(CURRENT_RESTAURANT_SEARCH_RESULTS)
+            add_new_restaurants_to_db(CURRENT_RESTAURANT_SEARCH_RESULTS)
             db.session.commit()
 
             flash("Search successful, new restaurants successfully added to database","success")
