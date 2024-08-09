@@ -1,3 +1,5 @@
+"""This file contains all the models that have to do with restaurants."""
+
 from models.init_db import db
 from datetime import datetime, timezone
 
@@ -11,11 +13,21 @@ class Restaurant(db.Model):
     id = db.Column(db.Text, primary_key=True)
     name = db.Column(db.Text, nullable=False)
     address = db.Column(db.Text)
+    cuisines = db.Column(db.Text)
     description = db.Column(db.Text)
+    phone = db.Column(db.Text)
     photo_url = db.Column(db.Text, default="/static/images/default-restaurant-image.jpg")
 
-    location_lat = db.Column(db.Float)
-    location_long = db.Column(db.Float)
+    latitude = db.Column(db.Float)
+    longitude = db.Column(db.Float)
+
+    sunday_hours = db.Column(db.Text)
+    monday_hours = db.Column(db.Text)
+    tuesday_hours = db.Column(db.Text)
+    wednesday_hours = db.Column(db.Text)
+    thursday_hours = db.Column(db.Text)
+    friday_hours = db.Column(db.Text)
+    saturday_hours = db.Column(db.Text)
 
     # Relationships to link a restaurant location to the list of reviews and favorites for it.
     reviews = db.relationship('Restaurant_Review', cascade='all, delete', backref='restaurant')

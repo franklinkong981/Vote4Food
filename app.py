@@ -17,15 +17,14 @@ from models.restaurant import Restaurant, Restaurant_Favorite, Restaurant_Review
 from models.item import Item, Item_Favorite, Item_Review
 from models.connect import connect_db
 
-from helpers import build_restaurant_address_string, build_restaurant_cuisine_string, format_phone_number, get_restaurant_photo_url
+from api_helpers import get_address_info, get_restaurant_search_results
+
+from helpers.restaurant_helpers import build_restaurant_address_string, build_restaurant_cuisine_string, format_restaurant_phone_number, get_restaurant_photo_url
 
 """This key will be in the Flask session and contain the logged in user's id once a user successfully logs in, will be removed once a user
 successfully logs out."""
 CURRENT_USER_KEY = "logged_in_user"
 GO_BACK_URL = "back_url"
-
-GEOLOCATION_API_URL = "http://api.positionstack.com/v1/forward"
-SPOONACULAR_RESTAURANT_SEARCH_URL = "https://api.spoonacular.com/food/restaurants/search"
 
 def create_app(db_name, testing=False):
     """Create an instance of the app to ensure separate production database and testing database, and that sample data inserted into
@@ -79,18 +78,6 @@ def create_app(db_name, testing=False):
         """Remove the previously logged in user's id from the Flask session to indicate no user is currently logged in."""
 
         del session[CURRENT_USER_KEY]
-    
-    def get_address_info(zip_code):
-        """Calls the Position Stack Geolocation API which converts the zip_code into an address object that contains information like
-        longitude, latitude, region, etc. Returns the long/lat coordinates in the most relevant/first address object found and raises 
-        an error if no results are found."""
-
-        response = requests.get(GEOLOCATION_API_URL, params={"access_key": os.environ.get('POSITION_STACK_API_KEY'), "query": str(zip_code)})
-        if len(response.json()['data']) == 0:
-            raise ValueError("The zip code you entered is not a registered US zip code.")
-        address_data = response.json()['data'][0]
-        return {'longitude': float(address_data['longitude']), 'latitude': float(address_data['latitude'])}
-
 
     ##############################################################################
     # Functions for user login/logout, as well as convenient access to logged in user information.
@@ -295,15 +282,8 @@ def create_app(db_name, testing=False):
     ##############################################################################
     # Routes relevant to searching for restaurants, mainly through the restaurant search bar in the navbar.
 
+    # Keeps the results of the most recent restaurant search query stored so it persists across different routes/redirects.
     CURRENT_RESTAURANT_SEARCH_RESULTS = []
-
-    def get_restaurant_search_results(search_query, latitude, longitude):
-        """Calls the Spoonacular API Restaurant Search route and returns the list of restaurant JSON objects that match the search
-        query and are located near the latitude and longitude."""
-
-        restaurants_response = requests.get(SPOONACULAR_RESTAURANT_SEARCH_URL, params={"apiKey": os.environ.get('SPOONACULAR_API_KEY'), "query": search_query, "lat": latitude, "lng": longitude, "distance": 5})
-        restaurants_data = restaurants_response.json()["restaurants"]
-        return restaurants_data
     
     def store_restaurant_search_results(restaurants):
         """Extract the important information about each restaurant in the most recent restaurant search results such as opening hours,
@@ -325,7 +305,7 @@ def create_app(db_name, testing=False):
             'longitude': restaurant['address']['longitude'],
             'cuisines': build_restaurant_cuisine_string(restaurant["cuisines"]),
             'description': restaurant["description"] or None,
-            'phone': format_phone_number(restaurant["phone_number"]),
+            'phone': format_restaurant_phone_number(restaurant["phone_number"]),
             'hours': restaurant['local_hours']['operational'] or None,
             'photo_url': get_restaurant_photo_url(restaurant)
         }
@@ -349,8 +329,8 @@ def create_app(db_name, testing=False):
                 address = restaurant['address'],
                 description = restaurant['description'],
                 photo_url = restaurant['photo_url'],
-                location_lat = restaurant['latitude'],
-                location_long = restaurant['longitude']
+                latitude = restaurant['latitude'],
+                longitude = restaurant['longitude']
             )
             db.session.add(new_restaurant)
 
@@ -360,8 +340,9 @@ def create_app(db_name, testing=False):
         """This route consists of 4 steps:
         1. Calls the PositionStack API to return a longitude and latitude corresponding to the zip code the user typed in.
         2. Calls the Spoonacular API to search for all restaurants that match the search query and are located near the zip code.
-        3. Extracts several pieces of useful information from each restaurant object in the JSON response and store them.
-        4. Adds each restaurant whose id isn't found in the database into the vouch4Food database as a Restaurant object."""
+        3. Extracts several pieces of useful information from each restaurant object in the JSON response and stores them for persistence.
+        4. Adds each restaurant whose id isn't found in the database into the vouch4Food database as a Restaurant object.
+            If the id is found, update the restaurant information if any data in the JSON for that restaurant has changed."""
         
         if not g.user:
             flash("Please sign in to search for restaurants", "danger")

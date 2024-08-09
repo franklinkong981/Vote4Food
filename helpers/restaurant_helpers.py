@@ -1,7 +1,4 @@
-"""This file contains helper functions that don't have to do with calling an API or managing a database."""
-
-##############################################################################
-# Functions for managing restaurant data.
+"""This file contains helper functions for managing restaurant data that don't have to do with calling an API or managing a database."""
 
 def build_restaurant_address_string(address_obj):
     """Each restaurant JSON object returned by the Spoonacular API should have an address object. This function converts this address
@@ -42,7 +39,7 @@ def get_restaurant_photo_url(restaurant):
     else:
         return None
     
-def format_phone_number(phone_number):
+def format_restaurant_phone_number(phone_number):
     """Each restaurant JSON object should have a numeric phone number that's either 10 or 11 digits. This function formats it into a string."""
 
     phone_number_string = str(phone_number)

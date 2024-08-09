@@ -1,3 +1,5 @@
+"""This file contains the User model."""
+
 from flask_bcrypt import Bcrypt #For user signup/login password hashing
 
 from models.init_db import db

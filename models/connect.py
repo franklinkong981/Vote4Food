@@ -1,3 +1,5 @@
+"""Initializes the SQLAlchemy database and connects it to the application context. All the models in this folder will be in this database."""
+
 from models.init_db import db
 
 def connect_db(app):

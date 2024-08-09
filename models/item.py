@@ -1,3 +1,5 @@
+"""This file contains all the models that have to do with menu items."""
+
 from models.init_db import db
 from datetime import datetime, timezone
 
