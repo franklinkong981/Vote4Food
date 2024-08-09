@@ -11,7 +11,12 @@ import requests
 from forms.authenticate_forms import SignUpForm, LoginForm
 from forms.profile_forms import EditProfileForm, ChangePasswordForm, SetLocationForm
 
-from models import db, connect_db, User, Restaurant, Item, Restaurant_Review, Item_Review, Restaurant_Favorite, Item_Favorite
+from models.init_db import db
+from models.user import User
+from models.restaurant import Restaurant, Restaurant_Favorite, Restaurant_Review
+from models.item import Item, Item_Favorite, Item_Review
+from models.connect import connect_db
+
 from helpers import build_restaurant_address_string, build_restaurant_cuisine_string, format_phone_number, get_restaurant_photo_url
 
 """This key will be in the Flask session and contain the logged in user's id once a user successfully logs in, will be removed once a user
