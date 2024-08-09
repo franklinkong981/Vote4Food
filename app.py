@@ -8,7 +8,9 @@ from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 import requests
 
-from forms import SignUpForm, LoginForm, EditProfileForm, ChangePasswordForm, SetLocationForm, SearchRestaurantForm
+from forms.authenticate_forms import SignUpForm, LoginForm
+from forms.profile_forms import EditProfileForm, ChangePasswordForm, SetLocationForm
+
 from models import db, connect_db, User, Restaurant, Item, Restaurant_Review, Item_Review, Restaurant_Favorite, Item_Favorite
 from helpers import build_restaurant_address_string, build_restaurant_cuisine_string, format_phone_number, get_restaurant_photo_url
 
