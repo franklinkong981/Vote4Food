@@ -15,6 +15,9 @@
           Add to Favorites <i class="fa-regular fa-star"></i>
         {% endif %}
         </button>
+        <a class="btn btn-info" href="{{url_for('create_restaurant_review', restaurant_id=restaurant.id)}}">
+          Create a New Review <i class="fa-solid fa-pencil"></i>
+        </a>
     </form>
 
     <p><i class="fa-solid fa-location-dot" title="address"></i> {{restaurant.address or "N/A"}}</p>

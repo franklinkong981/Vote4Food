@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %} Add Review for {{restaurant.name}} {% endblock %}
+
+{% block content %}
+<div class="row justify-content-md-center">
+    <div class="col-md-4">
+      <h2 class="display-2">Create a New Review for {{restaurant.name}}.</h2>
+      <form method="POST">
+        {{ form.hidden_tag() }}
+
+        {% for field in form if field.widget.input_type != 'hidden' %}
+          {% for error in field.errors %}
+            <span class="text-danger">{{ error }}</span>
+          {% endfor %}
+          <div class="form-group">
+            {{field.label}}
+            {{field(class_="form-control")}}
+          </div>
+        {% endfor %}
+
+        <button class="btn btn-success">Create Review</button>
+        <a href="{{url_for('display_restaurant_page', restaurant_id=restaurant.id)}}" class="btn btn-outline-secondary">Cancel</a>
+      </form>
+    </div>
+  </div>
+{% endblock %}
