@@ -400,6 +400,33 @@ def create_app(db_name, testing=False):
         restaurant = Restaurant.query.get_or_404(restaurant_id)
 
         return render_template('/restaurants/details.html', restaurant=restaurant)
+    
+    @app.route("/restaurants/<restaurant_id>/favorite", methods=["POST"])
+    def toggle_restaurant_to_favorites(restaurant_id):
+        """Adds the restaurant to the list of the current logged in user's favorites or removes it if the logged in user currently
+        has it in their favorites."""
+
+        if not g.user:
+            flash("Please sign in to add a restaurant to your list of favorites", "danger")
+            return redirect("/")
+        
+        favorited_restaurant = Restaurant.query.get_or_404(restaurant_id)
+
+        try:
+            if favorited_restaurant in g.user.favorite_restaurants:
+                g.user.favorite_restaurants = [restaurant for restaurant in g.user.favorite_restaurants if restaurant != favorited_restaurant]
+                flash("Restaurant successfully removed from favorites!", "success")
+            else:
+                g.user.favorite_restaurants.append(favorited_restaurant)
+                flash("Restaurant successfully added to favorites", "success")
+            
+            db.session.commit()
+        except:
+            flash("Unable to connect to/access the database. Please try again later.", "danger") 
+
+        redirect_url = request.referrer or "/"
+        return redirect(redirect_url)
+        
 
     ##############################################################################
     @app.route('/')
