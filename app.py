@@ -6,7 +6,7 @@ import os
 from flask import Flask, render_template, request, flash, redirect, session, g
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
-import requests
+from sqlalchemy import desc
 
 from forms.authenticate_forms import SignUpForm, LoginForm
 from forms.profile_forms import EditProfileForm, ChangePasswordForm, SetLocationForm
@@ -399,8 +399,10 @@ def create_app(db_name, testing=False):
         
         # returns a 404 error if the restaurant isn't found in the database.
         restaurant = Restaurant.query.get_or_404(restaurant_id)
+        # Get all reviews for this restaurant location, newest first.
+        restaurant_reviews = Restaurant_Review.query.filter(Restaurant_Review.restaurant_id == restaurant_id).order_by(desc(Restaurant_Review.created_at))
 
-        return render_template('/restaurants/details.html', restaurant=restaurant)
+        return render_template('/restaurants/details.html', restaurant=restaurant, restaurant_reviews=restaurant_reviews)
     
     @app.route("/restaurants/<restaurant_id>/favorite", methods=["POST"])
     def toggle_restaurant_to_favorites(restaurant_id):
