@@ -10,6 +10,7 @@ import requests
 
 from forms.authenticate_forms import SignUpForm, LoginForm
 from forms.profile_forms import EditProfileForm, ChangePasswordForm, SetLocationForm
+from forms.restaurant_forms import AddRestaurantReviewForm
 
 from models.init_db import db
 from models.user import User
@@ -426,7 +427,35 @@ def create_app(db_name, testing=False):
 
         redirect_url = request.referrer or "/"
         return redirect(redirect_url)
+    
+    @app.route("/restaurants/<restaurant_id>/reviews/new", methods=["GET", "POST"])
+    def create_restaurant_review(restaurant_id):
+        """Creates a new review from the logged in user for the restaurant with the id of restaurant_id."""
+
+        if not g.user:
+            flash("Please sign in to review a restaurant", "danger")
+            return redirect("/")
         
+        restaurant = Restaurant.query.get_or_404(restaurant_id)
+        form = AddRestaurantReviewForm()
+
+        if form.validate_on_submit():
+            try:
+                new_review = Restaurant_Review(
+                    author_id = g.user.id,
+                    restaurant_id = restaurant_id,
+                    title = form.title.data,
+                    content = form.content.data
+                )
+                db.session.add(new_review)
+                db.session.commit()
+
+                flash(f"New review for {restaurant.name} successfully added", "success")
+                return redirect(f"/restaurants/{restaurant.id}")
+            except:
+                flash("Unable to add review. There was trouble in connecting to/accessing the database. Please try again later.", "danger")
+        
+        return render_template("/restaurants/add_review.html", restaurant=restaurant, form=form)
 
     ##############################################################################
     @app.route('/')
