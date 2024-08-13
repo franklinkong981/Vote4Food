@@ -289,7 +289,7 @@ def create_app(db_name, testing=False):
         """Extract the important information about each restaurant in the most recent restaurant search results such as opening hours,
         name, etc. and store them in an array."""
 
-        CURRENT_RESTAURANT_SEARCH_RESULTS = []
+        CURRENT_RESTAURANT_SEARCH_RESULTS.clear()
         for restaurant in restaurants:
             store_restaurant_search_result(restaurant)
     

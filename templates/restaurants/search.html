@@ -5,27 +5,18 @@
 {% block content %}
 <h2 class="display-2">Search Results: {{number_results}} results</h2>
 
+{% if restaurant_results | count == 0 %}
+    <p>Sorry, there were no restaurants matching your search near the zip code you entered.</p>
+{% endif %}
+
 {% for restaurant in restaurant_results %}
-    <p>Name: {{restaurant['name']}}</p>
-    <p>Address: {{restaurant['address'] or "N/A"}}</p>
-    <p>Latitude: {{restaurant['latitude']}}</p>
-    <p>Longitude: {{restaurant['longitude']}}</p>
-    <p>Cuisines: {{restaurant['cuisines'] or "N/A"}}</p>
-    <p>Description: {{restaurant['description'] or "N/A"}}</p>
-    <p>Phone Number: {{restaurant['phone'] or "N/A"}}</p>
-    <p>Hours:</p>
-    <ul>
-        <li>Monday: {{restaurant['hours']['Monday'] or "N/A"}}</li>
-        <li>Tuesday: {{restaurant['hours']['Tuesday'] or "N/A"}}</li>
-        <li>Wednesday: {{restaurant['hours']['Wednesday'] or "N/A"}}</li>
-        <li>Thursday: {{restaurant['hours']['Thursday'] or "N/A"}}</li>
-        <li>Friday: {{restaurant['hours']['Friday'] or "N/A"}}</li>
-        <li>Saturday: {{restaurant['hours']['Saturday'] or "N/A"}}</li>
-        <li>Sunday: {{restaurant['hours']['Sunday'] or "N/A"}}</li>
-    </ul>
     {% if restaurant['photo_url'] %}
         <img src="{{restaurant['photo_url']}}" alt="Photo of {{restaurant['name']}}"/>
     {% endif %}
+    <p>Name: <a href="#">{{restaurant['name']}}</a> </p>
+    <p>Address: {{restaurant['address'] or "N/A"}}</p>
+    <p>Cuisine(s): {{restaurant['cuisines'] or "N/A"}}</p>
+    <p>About: {{restaurant['description'] or "N/A"}}</p>
 
     <hr>
 {% endfor %}
