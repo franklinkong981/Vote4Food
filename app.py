@@ -430,7 +430,7 @@ def create_app(db_name, testing=False):
         redirect_url = request.referrer or "/"
         return redirect(redirect_url)
     
-    @app.route("/restaurants/<restaurant_id>/reviews/new", methods=["GET", "POST"])
+    @app.route("/restaurants/<restaurant_id>/reviews/create", methods=["GET", "POST"])
     def create_restaurant_review(restaurant_id):
         """Creates a new review from the logged in user for the restaurant with the id of restaurant_id."""
 
@@ -459,7 +459,7 @@ def create_app(db_name, testing=False):
         
         return render_template("/restaurants/add_review.html", restaurant=restaurant, form=form)
     
-    @app.route("/restaurants/<restaurant_id>/reviews/<int:review_id>/edit", methods=["GET", "POST"])
+    @app.route("/restaurants/<restaurant_id>/reviews/<int:review_id>/update", methods=["GET", "POST"])
     def update_restaurant_review(restaurant_id, review_id):
         """Updates a particular review for a particular restaurant as long as the review being updated was written by the 
         logged in user currently updating it."""
@@ -487,9 +487,36 @@ def create_app(db_name, testing=False):
                 flash(f"Review for {restaurant.name} successfully updated", "success")
                 return redirect(f"/restaurants/{restaurant_id}")
             except:
-                flash("Unable to add review. There was trouble in connecting to/accessing the database. Please try again later.", "danger")
+                flash("Unable to edit review. There was trouble in connecting to/accessing the database. Please try again later.", "danger")
 
         return render_template("/restaurants/edit_review.html", restaurant=restaurant, form=form)
+    
+    @app.route("/restaurants/<restaurant_id>/reviews/<int:review_id>/delete", methods=["POST"])
+    def delete_restaurant_review(restaurant_id, review_id):
+        """Deletes a restaurant review as long as it was written by the currently logged in user."""
+
+        if not g.user:
+            flash("Please sign in to delete your restaurant reviews", "danger")
+            return redirect("/")
+        
+        restaurant = Restaurant.query.get_or_404(restaurant_id)
+        review = Restaurant_Review.query.get_or_404(review_id)
+        # Only allow users to delete their own restaurant reviews
+        if review.author.id != g.user.id:
+            flash("You can only delete reviews that you created!", "danger")
+            redirect_url = request.referrer or "/"
+            return redirect(redirect_url)
+        
+        try:
+            db.session.delete(review)
+            db.session.commit()
+
+            flash(f"Your review for {restaurant.name} was successfully deleted!", "success")
+        except:
+            flash("Unable to delete review. There was trouble in connecting to/accessing the database. Please try again later.", "danger")
+
+        return redirect(f"/restaurants/{restaurant_id}")
+
     ##############################################################################
     @app.route('/')
     def homepage():
