@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %} Vouch4Food - Change Location {% endblock %}
+{% block title %} Vouch4Food - Search Results {% endblock %}
 
 {% block content %}
 <h2 class="display-2">Search Results: {{number_results}} results</h2>
@@ -13,7 +13,7 @@
     {% if restaurant['photo_url'] %}
         <img src="{{restaurant['photo_url']}}" alt="Photo of {{restaurant['name']}}"/>
     {% endif %}
-    <p>Name: <a href="#">{{restaurant['name']}}</a> </p>
+    <p>Name: <a href="{{url_for('display_restaurant_page', restaurant_id=restaurant.id)}}" target="_blank">{{restaurant['name']}}</a> </p>
     <p>Address: {{restaurant['address'] or "N/A"}}</p>
     <p>Cuisine(s): {{restaurant['cuisines'] or "N/A"}}</p>
     <p>About: {{restaurant['description'] or "N/A"}}</p>

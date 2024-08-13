@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %} {{restaurant.name}} Details {% endblock %}
+
+{% block content %}
+    <img src="{{restaurant.photo_url}}" alt="Photo of {{restaurant.name}}"/>
+
+    <h1 class="display-1">{{restaurant.name}}</h1>
+
+    <p><i class="fa-solid fa-location-dot" title="address"></i> {{restaurant.address or "N/A"}}</p>
+    <p><i class="fa-solid fa-globe" title="coordinates"></i> Latitude: {{restaurant.latitude}} Longitude: {{restaurant.longitude}}</p>
+    <p><i class="fa-solid fa-phone" title="phone-number"></i> {{restaurant.phone or "N/A"}}</p>
+
+    <p><i class="fa-solid fa-circle-info" title="description"></i> {{restaurant.description or "N/A"}}</p>
+    <p><i class="fa-solid fa-utensils" title="cuisines"></i> {{restaurant.cuisines or "N/A"}}</p>
+
+    <h3 class="display-3">Hours:</h3>
+    <ul>
+        <li>Sunday: {{restaurant.sunday_hours or "N/A"}}</li>
+        <li>Monday: {{restaurant.monday_hours or "N/A"}}</li>
+        <li>Tuesday: {{restaurant.tuesday_hours or "N/A"}}</li>
+        <li>Wednesday: {{restaurant.wednesday_hours or "N/A"}}</li>
+        <li>Thursday: {{restaurant.thursday_hours or "N/A"}}</li>
+        <li>Friday: {{restaurant.friday_hours or "N/A"}}</li>
+        <li>Saturday: {{restaurant.saturday_hours or "N/A"}}</li>
+    </ul>
+
+{% endblock %}

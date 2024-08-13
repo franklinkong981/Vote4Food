@@ -372,8 +372,34 @@ def create_app(db_name, testing=False):
 
     @app.route("/restaurants")
     def show_restaurant_search_results():
+        """Displays each restaurant in the search results each with a link to a page containing more information about that restaurant."""
+
+        if not g.user:
+            flash("Please sign in to search for restaurants", "danger")
+            return redirect("/")
 
         return render_template('/restaurants/search.html', number_results=len(CURRENT_RESTAURANT_SEARCH_RESULTS), restaurant_results=CURRENT_RESTAURANT_SEARCH_RESULTS)
+
+    ##############################################################################
+    # Routes relevant to restaurant pages, including adding/removing a restaurant from the user's favorites and creating, editing, 
+    # and deleting a review for the restaurant.
+
+    @app.route("/restaurants/<restaurant_id>")
+    def display_restaurant_page(restaurant_id):
+        """Displays detailed restaurant information of a restaurant with a particular id. This restaurant should be one that has already
+        come up in a previous search result by any user. The page should display detailed information like the restaurant's opening hours
+        and have a button for the user to add the restaurant to their list of favorite restaurants. It should also list all reviews
+        of the restaurant with most recent first, and have links for the user to create, edit, and delete their own reviews.
+        Finally, there will be a link to take the user to a list of the restaurant's menu items."""
+
+        if not g.user:
+            flash("Please sign in to see details for a restaurant", "danger")
+            return redirect("/")
+        
+        # returns a 404 error if the restaurant isn't found in the database.
+        restaurant = Restaurant.query.get_or_404(restaurant_id)
+
+        return render_template('/restaurants/details.html', restaurant=restaurant)
 
     ##############################################################################
     @app.route('/')
