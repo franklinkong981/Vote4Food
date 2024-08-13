@@ -16,7 +16,7 @@
         {% endif %}
         </button>
         <a class="btn btn-info" href="{{url_for('create_restaurant_review', restaurant_id=restaurant.id)}}">
-          Create a New Review <i class="fa-solid fa-pencil"></i>
+          Create a New Review <i class="fa-solid fa-comment"></i>
         </a>
     </form>
 
@@ -48,6 +48,12 @@
       <h4 class="display-4">{{review.title}}</h4>
       <p>{{review.content}}</p>
       <p class="font-weight-light">By {{review.author.get_full_name()}}, created at {{review.created_at}}</p>
+      {% if review.author.id == g.user.id %}
+        <br>
+        <a class="btn btn-light" href="{{url_for('update_restaurant_review', restaurant_id=restaurant.id, review_id=review.id)}}">
+          Edit <i class="fa-solid fa-pencil"></i>
+        </a>
+      {% endif %}
       <hr>
     {% endfor %}
 

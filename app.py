@@ -458,7 +458,38 @@ def create_app(db_name, testing=False):
                 flash("Unable to add review. There was trouble in connecting to/accessing the database. Please try again later.", "danger")
         
         return render_template("/restaurants/add_review.html", restaurant=restaurant, form=form)
+    
+    @app.route("/restaurants/<restaurant_id>/reviews/<int:review_id>/edit", methods=["GET", "POST"])
+    def update_restaurant_review(restaurant_id, review_id):
+        """Updates a particular review for a particular restaurant as long as the review being updated was written by the 
+        logged in user currently updating it."""
 
+        if not g.user:
+            flash("Please sign in to edit your restaurant reviews", "danger")
+            return redirect("/")
+        
+        restaurant = Restaurant.query.get_or_404(restaurant_id)
+        review = Restaurant_Review.query.get_or_404(review_id)
+        # Only allow users to edit their own restaurant reviews
+        if review.author.id != g.user.id:
+            flash("You can only edit reviews that you created!", "danger")
+            redirect_url = request.referrer or "/"
+            return redirect(redirect_url)
+
+        form = AddRestaurantReviewForm(obj=review)
+        if form.validate_on_submit():
+            try:
+                review.title = form.title.data
+                review.content = form.content.data
+
+                db.session.commit()
+
+                flash(f"Review for {restaurant.name} successfully updated", "success")
+                return redirect(f"/restaurants/{restaurant_id}")
+            except:
+                flash("Unable to add review. There was trouble in connecting to/accessing the database. Please try again later.", "danger")
+
+        return render_template("/restaurants/edit_review.html", restaurant=restaurant, form=form)
     ##############################################################################
     @app.route('/')
     def homepage():
