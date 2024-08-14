@@ -656,6 +656,32 @@ def create_app(db_name, testing=False):
 
         return render_template('/items/details.html', item=item)
     
+    @app.route("/items/<int:item_id>/favorite", methods=["POST"])
+    def toggle_item_to_favorites(item_id):
+        """Adds the menu item to the list of the current logged in user's favorites or removes it if the logged in user currently
+        has it in their favorites."""
+
+        if not g.user:
+            flash("Please sign in to add a menu item to your list of favorites", "danger")
+            return redirect("/")
+        
+        favorited_item = Item.query.get_or_404(item_id)
+
+        try:
+            if favorited_item in g.user.favorite_items:
+                g.user.favorite_items = [item for item in g.user.favorite_items if item != favorited_item]
+                flash("Menu item successfully removed from favorites!", "success")
+            else:
+                g.user.favorite_items.append(favorited_item)
+                flash("Menu item successfully added to favorites", "success")
+            
+            db.session.commit()
+        except:
+            flash("Unable to connect to/access the database. Please try again later.", "danger") 
+
+        redirect_url = request.referrer or "/"
+        return redirect(redirect_url)
+    
     ##############################################################################
     @app.route('/')
     def homepage():

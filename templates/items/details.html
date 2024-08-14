@@ -8,4 +8,17 @@
     <h1 class="display-1">{{item.title}}</h1><br>
     <h3 class="display-3">From {{item.restaurant_chain}}</h3>
 
+    <form method="POST" action="{{url_for('toggle_item_to_favorites', item_id=item.id)}}">
+        <button class="btn btn-primary">
+        {% if item in g.user.favorite_items %}
+          Remove from Favorites <i class="fa-solid fa-star"></i> 
+        {% else %}
+          Add to Favorites <i class="fa-regular fa-star"></i>
+        {% endif %}
+        </button>
+        <a class="btn btn-info" href="#">
+          Create a New Review <i class="fa-solid fa-comment"></i>
+        </a>
+    </form>
+
 {% endblock %}
