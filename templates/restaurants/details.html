@@ -27,6 +27,10 @@
     <p><i class="fa-solid fa-circle-info" title="description"></i> {{restaurant.description or "N/A"}}</p>
     <p><i class="fa-solid fa-utensils" title="cuisines"></i> {{restaurant.cuisines or "N/A"}}</p>
 
+    <form method="POST" action="{{url_for('add_menu_items_to_db', restaurant_id=restaurant.id)}}">
+      <button class="btn btn-secondary">See Menu Items Recognized from this Restaurant</button>
+    </form>
+
     <h3 class="display-3">Hours:</h3>
     <ul>
         <li>Sunday: {{restaurant.sunday_hours or "N/A"}}</li>

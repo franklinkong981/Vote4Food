@@ -519,8 +519,7 @@ def create_app(db_name, testing=False):
         return redirect(f"/restaurants/{restaurant_id}")
     
     ##############################################################################
-    # Routes relevant to menu item pages, including the page that lists out the menu items belonging to a specific chain restaurant,
-    # adding/removing an itemfrom the user's favorites and creating, editing, and deleting a review for the item.
+    # Routes relevant to the menu item search page, which lists out the menu items belonging to a specific chain restaurant.
 
     # Keeps important information about menu items belonging to a particular chain restaurant so that results can easily be displayed.
     CURRENT_MENU_ITEMS = []
@@ -540,7 +539,7 @@ def create_app(db_name, testing=False):
         # In Spoonacular, if the first menu item in search results doesn't belong to the restaurant with restaurant_id, then
         # there are no menu items that belong to it.
         if total_items > 0 and does_item_belong_to_restaurant(initial_item_json['menuItems'][0], restaurant.name):
-            store_menu_items(initial_item_json['menuItems'])
+            store_menu_items(initial_item_json['menuItems'], restaurant.name)
             store_additional_menu_items(restaurant.name, total_items)
     
     def store_additional_menu_items(restaurant_chain, total_items):
@@ -548,31 +547,32 @@ def create_app(db_name, testing=False):
         since each call to return menu items from this API returns a maximum of 100 results. This function calls the API as many times
         as needed with offsets to get all menu items based on the total menu items belonging to the restaurant then stores them."""
 
-        offset = 1
-        while (offset * 100) < total_items:
+        offset = 100
+        while offset < total_items:
             menu_items_raw = get_menu_items_only(restaurant_chain, offset)
-            store_menu_items(menu_items_raw)
-            offset += 1
+            store_menu_items(menu_items_raw, restaurant_chain)
+            offset += 100
     
-    def store_menu_items(raw_menu_items_list):
+    def store_menu_items(raw_menu_items_list, restaurant_name):
         """Extracts important information like name, etc. from each menu item (which is represented in JSON) in the raw_menu_items_list
         and stores it in the CURRENT_MENU_ITEMS array."""
 
         for item in raw_menu_items_list:
-            store_menu_item(item)
+            store_menu_item(item, restaurant_name)
     
-    def store_menu_item(item):
-        """Item is an object that contains attributes of a specific menu item. This function extracts the id of the item, its name, 
-        the restaurant chain it belongs to, and the url for a photo of it. It wraps these attributes into an object and appends
-        the object to the CURRENT_MENU_ITEMS array."""
+    def store_menu_item(item, restaurant_name):
+        """Item is an object that contains attributes of a specific menu item. If the item belongs to the chain restaurant restaurant_name, 
+        this function extracts the id of the item, its name, the restaurant chain it belongs to, and the url for a photo of it. 
+        It wraps these attributes into an object and appendsthe object to the CURRENT_MENU_ITEMS array."""
 
-        menu_item_data = {
+        if item['restaurantChain'] == restaurant_name:
+            menu_item_data = {
             'id': item['id'],
             'title': item['title'],
             'restaurant_chain': item['restaurantChain'] or None,
             'image_url': item['image'] or None
-        }
-        CURRENT_MENU_ITEMS.append(menu_item_data)
+            }
+            CURRENT_MENU_ITEMS.append(menu_item_data)
     
     def add_new_menu_items_to_db(menu_items):
         """Add all new menu items from search results into the Item database."""
@@ -629,8 +629,10 @@ def create_app(db_name, testing=False):
         if not g.user:
             flash("Please sign in to search for menu items wihin a restaurant", "danger")
             return redirect("/")
+        
+        restaurant = Restaurant.query.get_or_404(restaurant_id)
 
-        return render_template('/items/search.html', number_results=len(CURRENT_MENU_ITEMS), menu_item_results=CURRENT_MENU_ITEMS)
+        return render_template('/items/search.html', restaurant=restaurant, number_results=len(CURRENT_MENU_ITEMS), menu_item_results=CURRENT_MENU_ITEMS)
 
     ##############################################################################
     @app.route('/')

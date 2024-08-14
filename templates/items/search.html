@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %} Menu Items in {{restaurant.name}} {% endblock %}
+
+{% block content %}
+<a class="btn btn-secondary" href="{{url_for('display_restaurant_page', restaurant_id=restaurant.id)}}">Back</a>
+<h2 class="display-2">List of Menu Items Belonging to {{restaurant.name}}: {{number_results}} results</h2>
+
+{% if menu_item_results | count == 0 %}
+    <p>Sorry, there were no menu items found belonging to {{restaurant.name}}</p>
+{% endif %}
+
+{% for item in menu_item_results %}
+    {% if item['image_url'] %}
+        <img src="{{item['image_url']}}" alt="Photo of {{item['title']}}"/>
+    {% endif %}
+    <p><a href="#" target="_blank">{{item['title']}}</a> </p>
+
+    <hr>
+{% endfor %}
+
+{% endblock %}
