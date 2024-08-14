@@ -18,9 +18,10 @@ from models.restaurant import Restaurant, Restaurant_Favorite, Restaurant_Review
 from models.item import Item, Item_Favorite, Item_Review
 from models.connect import connect_db
 
-from api_helpers import get_address_info, get_restaurant_search_results
+from api_helpers import get_address_info, get_restaurant_search_results, get_menu_items_json, get_menu_items_only
 
 from helpers.restaurant_helpers import build_restaurant_address_string, build_restaurant_cuisine_string, format_restaurant_phone_number, get_restaurant_photo_url
+from helpers.menu_item_helpers import does_item_belong_to_restaurant
 
 """This key will be in the Flask session and contain the logged in user's id once a user successfully logs in, will be removed once a user
 successfully logs out."""
@@ -516,6 +517,66 @@ def create_app(db_name, testing=False):
             flash("Unable to delete review. There was trouble in connecting to/accessing the database. Please try again later.", "danger")
 
         return redirect(f"/restaurants/{restaurant_id}")
+    
+    ##############################################################################
+    # Routes relevant to menu item pages, including the page that lists out the menu items belonging to a specific chain restaurant,
+    # adding/removing an itemfrom the user's favorites and creating, editing, and deleting a review for the item.
+
+    # Keeps important information about menu items belonging to a particular chain restaurant so that results can easily be displayed.
+    CURRENT_MENU_ITEMS = []
+
+    def store_all_menu_items(restaurant_id)
+        """Stores all menu items belonging to a certain chain restaurant into the array CURRENT_MENU_ITEMS. It gets all menu items
+        as JSON objects from the Spoonacular API and then extracts important information from each object, which it stores in another
+        object and adds to the CURRENT_MENU_ITEMS array."""
+
+        restaurant = Restaurant.query.get_or_404(restaurant_id)
+        
+        # Get total number of menu items in search results to see how many offsets you need to call to get JSON for all menu items.
+        initial_item_json = get_menu_items_json(restaurant.name, 0)
+        total_items = initial_item_json['totalMenuItems']
+
+        # In Spoonacular, if the first menu item in search results doesn't belong to the restaurant with restaurant_id, then
+        # there are no menu items that belong to it.
+        if total_items > 0 and does_item_belong_to_restaurant(initial_item_json['menuItems'][0], restaurant.name):
+            store_menu_items(initial_item_json['menuItems'])
+            store_additional_menu_items(restaurant.name, total_items)
+    
+    def store_additional_menu_items(restaurant_chain, total_items):
+        """When searching for menu items from a specific restaurant chain, multiple calls to the Spoonacular API may need to be made,
+        since each call to return menu items from this API returns a maximum of 100 results. This function calls the API as many times
+        as needed with offsets to get all menu items based on the total menu items belonging to the restaurant then stores them."""
+
+        offset = 1
+        while (offset * 100) < total_items:
+            menu_items_raw = get_menu_items_only(restaurant_chain, offset)
+            store_menu_items(menu_items_raw)
+    
+    
+
+
+
+
+    @app.route("/restaurants/<restaurant_id>/items/add", methods=["POST"])
+    def add_menu_items_to_db(restaurant_id):
+        """This route is triggered after the user clicks on the button to list out menu items belonging to a particular chain restaurant.
+        It does the following steps:
+        1. Get all menu items from the particular chain restaurant by calling the menu item search route in Spoonacular API. Since the API
+        returns a maximum of 100 items per response, makes additional calls to ensure all menu items are returned.
+        2. Each time a response is returned, extract important information like id, photo_url, etc. for each menu item that belongs to 
+        the chain restaurant and appends it as an object to the CURRENT_MENU_ITEMS array.
+        3. For each menu item, either adds it to the database as a new Item or checks if there is any information to update if the item
+        already exists in the database."""
+
+        if not g.user:
+            flash("Please sign in to search for a restaurant's menu items", "danger")
+            return redirect("/")
+        
+        try:
+            # Step 1 and 2
+            store_all_menu_items(restaurant_id)
+
+    @app.route("/restaurants/<restaurant_id>/items")
 
     ##############################################################################
     @app.route('/')

@@ -6,6 +6,7 @@ import requests
 
 GEOLOCATION_API_URL = "http://api.positionstack.com/v1/forward"
 SPOONACULAR_RESTAURANT_SEARCH_URL = "https://api.spoonacular.com/food/restaurants/search"
+SPOONACULAR_MENU_ITEM_SEARCH_URL = "https://api.spoonacular.com/food/menuItems/search"
 
 def get_address_info(zip_code):
     """Calls the Position Stack Geolocation API which converts the zip_code into an address object that contains information like
@@ -24,3 +25,20 @@ def get_restaurant_search_results(search_query, latitude, longitude):
     restaurants_response = requests.get(SPOONACULAR_RESTAURANT_SEARCH_URL, params={"apiKey": os.environ.get('SPOONACULAR_API_KEY'), "query": search_query, "lat": latitude, "lng": longitude, "distance": 5})
     restaurants_data = restaurants_response.json()["restaurants"]
     return restaurants_data
+
+def get_menu_items_json(restaurant_chain, offset):
+    """Calls the Spoonacular API Menu Item Search route and returns the list of menu item JSON objects (max. 100) that match the search query
+    which is the name of a restaurant chain. An offset is also provided in case there are more than 100 menu items that match the query.
+    Also contains some metadata including the total number of menu items there are in the results."""
+
+    menu_items_response = requests.get(SPOONACULAR_MENU_ITEM_SEARCH_URL, params={"apiKey": os.environ.get('SPOONACULAR_API_KEY'), "query": restaurant_chain, "number": 100, "offset": offset})
+    return menu_items_response.json()
+
+def get_menu_items_only(restaurant_chain, offset):
+    """Calls the Spoonacular API Menu Item Search route and returns the list of menu item JSON objects (max. 100) that match the search query
+    which is the name of a restaurant chain. An offset is also provided in case there are more than 100 menu items that match the query.
+    Only the list of menu items matching the search query are returned, no metadata."""
+
+    menu_items_response = requests.get(SPOONACULAR_MENU_ITEM_SEARCH_URL, params={"apiKey": os.environ.get('SPOONACULAR_API_KEY'), "query": restaurant_chain, "number": 100, "offset": offset})
+    return menu_items_response.json()['menuItems']
+
