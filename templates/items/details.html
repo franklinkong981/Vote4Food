@@ -16,7 +16,7 @@
           Add to Favorites <i class="fa-regular fa-star"></i>
         {% endif %}
         </button>
-        <a class="btn btn-info" href="#">
+        <a class="btn btn-info" href="{{url_for('create_item_review', item_id=item.id)}}">
           Create a New Review <i class="fa-solid fa-comment"></i>
         </a>
     </form>

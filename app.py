@@ -682,6 +682,35 @@ def create_app(db_name, testing=False):
         redirect_url = request.referrer or "/"
         return redirect(redirect_url)
     
+    @app.route("/items/<int:item_id>/reviews/create", methods=["GET", "POST"])
+    def create_item_review(item_id):
+        """Creates a new review from the logged in user for the menu item with the id of item_id."""
+
+        if not g.user:
+            flash("Please sign in to review a menu item", "danger")
+            return redirect("/")
+        
+        item = Item.query.get_or_404(item_id)
+        form = ReviewForm()
+
+        if form.validate_on_submit():
+            try:
+                new_review = Item_Review(
+                    author_id = g.user.id,
+                    item_id = item_id,
+                    title = form.title.data,
+                    content = form.content.data
+                )
+                db.session.add(new_review)
+                db.session.commit()
+
+                flash(f"New review for {item.title} successfully added", "success")
+                return redirect(f"/items/{item_id}")
+            except:
+                flash("Unable to add review. There was trouble in connecting to/accessing the database. Please try again later.", "danger")
+        
+        return render_template("/items/add_review.html", item=item, form=form)
+    
     ##############################################################################
     @app.route('/')
     def homepage():
