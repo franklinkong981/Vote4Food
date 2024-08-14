@@ -642,7 +642,7 @@ def create_app(db_name, testing=False):
     # and deleting a review for a menu item.
     
     @app.route("/items/<int: item_id>")
-    def display_restaurant_page(item_id):
+    def display_item_page(item_id):
         """Displays detailed information of a particular menu item. The page should have some information about the item. 
         There should also be buttons/links for the user to add/remove the item from their favorites and for a user to create,
         update, and delete their own reviews for the item."""
