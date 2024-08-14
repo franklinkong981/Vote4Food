@@ -573,6 +573,23 @@ def create_app(db_name, testing=False):
             'image_url': item['image'] or None
         }
         CURRENT_MENU_ITEMS.append(menu_item_data)
+    
+    def add_new_menu_items_to_db(menu_items):
+        """Add all new menu items from search results into the Item database."""
+        
+        for menu_item in menu_items:
+            add_or_update_new_item(menu_item)
+    
+    def add_or_update_new_item(item):
+        """Search for the item by id in the Vouch4Food Item database. If not found, add it to the database.
+        If found, check for information to update."""
+
+        database_item = Item.query.get(item['id'])
+
+        if not database_item:
+            Item.create_item(item)
+        else:
+            database_item.update_item(item)
 
     @app.route("/restaurants/<restaurant_id>/items/add", methods=["POST"])
     def add_menu_items_to_db(restaurant_id):
@@ -606,6 +623,14 @@ def create_app(db_name, testing=False):
         return redirect(redirect_url)
     
     @app.route("/restaurants/<restaurant_id>/items")
+    def show_menu_item_results(restaurant_id):
+        """Displays each item belonging to the restaurant with restaurant_id, each with a link to a page containing more information about that menu item."""
+
+        if not g.user:
+            flash("Please sign in to search for menu items wihin a restaurant", "danger")
+            return redirect("/")
+
+        return render_template('/items/search.html', number_results=len(CURRENT_MENU_ITEMS), menu_item_results=CURRENT_MENU_ITEMS)
 
     ##############################################################################
     @app.route('/')

@@ -14,6 +14,28 @@ class Item(db.Model):
     restaurant_chain = db.Column(db.Text)
     image_url = db.Column(db.Text, default="/static/images/default-menu-item-image.jpg")
 
+    @classmethod
+    def create_item(cls, item):
+        """Adds a new menu item to the database through a pre-filled item object."""
+
+        new_item = Item(
+            id = item['id'],
+            title = item['title'],
+            restaurant_chain = item['restaurant_chain'],
+            image_url = item['image_url'],
+        )
+        db.session.add(new_item)
+    
+    def update_item(self, item):
+        """Updates an existing Item in the database by comparing its information to the information in the item object,
+        which contains updated information about that menu item from the Spoonacualr API."""
+
+        # Only id is guaranteed to be the same, the rest might change.
+
+        if self.title != item['title']: self.title = item['title']
+        if self.restaurant_chain != item['restaurant_chain']: self.restaurant_chain = item['restaurant_chain']
+        if self.image_url != item['image_url']: self.image_url = item['image_url']
+
     # Relationships to link a menu item to the list of reviews and favorites for it.
     reviews = db.relationship('Item_Review', cascade='all, delete', backref='item')
     favorites = db.relationship('Item_Favorite', cascade='all, delete', backref='item')
