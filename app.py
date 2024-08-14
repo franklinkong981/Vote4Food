@@ -296,10 +296,61 @@ def create_app(db_name, testing=False):
         
         return render_template("users/edit_password.html", form=form)
     
+    ##############################################################################
+    # Routes/functions relevant to setting/updating the logged in user's locations and storing a list of nearby restaurant locations.
+
+    # Stores the list of restaurant locations near the user's set location (zip code, latitude, and longitude) that will be displayed
+    # on the user's home page.
+    CURRENT_RESTAURANTS_NEARBY = []
+
+    def store_nearby_restaurants(restaurants):
+        """Extract the important information about each restaurant near the user's current location such as opening hours,
+        name, etc. and store them in an array."""
+
+        CURRENT_RESTAURANTS_NEARBY.clear()
+        for restaurant in restaurants:
+            store_nearby_restaurant(restaurant)
+        
+        # If CURRENT_RESTAURANTS_NEARBY is still empty at this point, that means there are no registered restaurants near the user's
+        # location. Append something to indicate this.
+        if len(CURRENT_RESTAURANTS_NEARBY) == 0:
+            CURRENT_RESTAURANTS_NEARBY.append("NO RESTAURANTS NEARBY")
+    
+    def store_nearby_restaurant(restaurant):
+        """restaurant is a JSON Restaurant object returned from the Spoonacular API. This function extracts the useful data from it,
+        processes them into more readable formats, and appends it to an array that stores all restaurants near the user's current location."""
+
+        restaurant_data = {
+            'id': restaurant['_id'],
+            'name': restaurant['name'],
+            'address': build_restaurant_address_string(restaurant['address']),
+            'latitude': restaurant['address']['latitude'],
+            'longitude': restaurant['address']['longitude'],
+            'cuisines': build_restaurant_cuisine_string(restaurant["cuisines"]),
+            'description': restaurant["description"] or None,
+            'phone': format_restaurant_phone_number(restaurant["phone_number"]) if "phone_number" in restaurant else None,
+            'hours': restaurant['local_hours']['operational'] or None,
+            'photo_url': get_restaurant_photo_url(restaurant)
+        }
+        CURRENT_RESTAURANTS_NEARBY.append(restaurant_data)
+    
+    def get_and_store_nearby_restaurants():
+        """This method is called after the user either sets or updates their location by entering their current zip code on their home
+        or profile information page. This calls the Spoonacular API to get a list of nearby restaurants as JSON, and stores important 
+        information about each Restaurant JSON object returned into the CURRENT_RESTAURANTS_NEARBY array."""
+
+        # get list of restaurants near the location the user just set 
+        nearby_restaurants_data = get_restaurant_search_results("", g.user.location_lat, g.user.location_long)
+
+        # Store nearby restaurants in the array.
+        store_nearby_restaurants(nearby_restaurants_data)
+    
     @app.route('/users/profile/update_location', methods=['GET', 'POST'])
     def update_location():
         """Show the form that allows the logged in user to update their location by entering their 5-digit zip code. The zip code will then
-        be transformed into latitude and longitude coordinates"""
+        be transformed into latitude and longitude coordinates. 
+        The Spoonacular API will then be called to get a list of restaurants near the zip code entered, which will be displayed on the
+        user's home page."""
 
         if not g.user:
             flash("Please sign in to update your location", "danger")
@@ -319,15 +370,26 @@ def create_app(db_name, testing=False):
                 db.session.commit()
 
                 flash("Location successfully updated!", "success")
+
+                # Get and save restaurants nearby the zip code the user just entered.
+                get_and_store_nearby_restaurants()
+
+                # Save/update restaurant information in the database
+                add_new_restaurants_to_db(CURRENT_RESTAURANTS_NEARBY)
+                db.session.commit()
+
+                flash("Restaurants nearby generated and saved to database", "success")
+
                 if not g.back_url:
                     return redirect("/")
                 return redirect(g.back_url)
             except ValueError as exc:
                 flash("Unable to update location, the zip code you entered is not a registered US postal code. Please try again.", "danger")
                 print(f"ERROR: {exc}")
-            except:
+            except Exception as exc:
                 # Issue with connecting to SQLAlchemy database or Geolocation API.
-                flash("There was an error in connecting/accessing the database/geolocation API. Please try again later.", "danger")
+                flash("There was an error in connecting/accessing the database. Please try again later.", "danger")
+                print(f"ERROR: {exc}")
         
         return render_template("users/edit_location.html", form=form)
 
@@ -836,7 +898,10 @@ def create_app(db_name, testing=False):
             # go back to the page they came from if they decide not to update their location.
             session[GO_BACK_URL] = request.path
 
-            return render_template("home.html")
+            if g.user.location_lat and g.user.location_long and len(CURRENT_RESTAURANTS_NEARBY) == 0:
+                get_and_store_nearby_restaurants()
+
+            return render_template("home.html", nearby_restaurants=CURRENT_RESTAURANTS_NEARBY)
         else:
             return render_template("home_anon.html")
     
