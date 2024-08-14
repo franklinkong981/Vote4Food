@@ -173,7 +173,8 @@ def create_app(db_name, testing=False):
             flash("Please sign in to view your favorited restaurants", "danger")
             return redirect("/")
         
-        return render_template("/users/favorites/restaurants", favorites=g.user.favorite_restaurants)
+        number_favorites = len(list(g.user.favorite_restaurants))
+        return render_template("/users/favorites/restaurants.html", favorites=g.user.favorite_restaurants, number_favorites=number_favorites)
     
     @app.route('/users/favorite/items')
     def show_favorited_items():
@@ -183,7 +184,9 @@ def create_app(db_name, testing=False):
             flash("Please sign in to see your favorited menu items", "danger")
             return redirect("/")
         
-        return render_template("/users/favorites/items", favorites=g.user.favorite_items)
+        number_favorites = len(list(g.user.favorite_items))
+        
+        return render_template("/users/favorites/items.html", favorites=g.user.favorite_items, number_favorites=number_favorites)
     
     @app.route('/users/reviews/restaurants')
     def show_restaurant_reviews():
@@ -193,10 +196,12 @@ def create_app(db_name, testing=False):
             flash("Please sign in to view your restaurant reviews", "danger")
             return redirect("/")
         
+        session[GO_BACK_URL] = request.path
+        
         # get all of the logged in user's restaurant reviews, newest first.
         restaurant_reviews = Restaurant_Review.query.filter(Restaurant_Review.author_id == g.user.id).order_by(desc(Restaurant_Review.created_at))
 
-        return render_template("/users/reviews/restaurants", reviews=restaurant_reviews)
+        return render_template("/users/reviews/restaurants.html", reviews=restaurant_reviews)
     
     @app.route('/users/reviews/items')
     def show_item_reviews():
@@ -206,10 +211,12 @@ def create_app(db_name, testing=False):
             flash("Please sign in to view your menu item reviews", "danger")
             return redirect("/")
         
+        session[GO_BACK_URL] = request.path
+
         # get all of the logged in user's menu item reviews, newest first.
         item_reviews = Item_Review.query.filter(Item_Review.author_id == g.user.id).order_by(desc(Item_Review.created_at))
 
-        return render_template("/users/reviews/items", reviews=item_reviews)
+        return render_template("/users/reviews/items.html", reviews=item_reviews)
 
 
     @app.route('/users/profile')
@@ -441,6 +448,8 @@ def create_app(db_name, testing=False):
             flash("Please sign in to see details for a restaurant", "danger")
             return redirect("/")
         
+        session[GO_BACK_URL] = request.path
+        
         # returns a 404 error if the restaurant isn't found in the database.
         restaurant = Restaurant.query.get_or_404(restaurant_id)
         # Get all reviews for this restaurant location, newest first.
@@ -559,7 +568,8 @@ def create_app(db_name, testing=False):
         except:
             flash("Unable to delete review. There was trouble in connecting to/accessing the database. Please try again later.", "danger")
 
-        return redirect(f"/restaurants/{restaurant_id}")
+        redirect_url = request.referrer or "/"
+        return redirect(redirect_url)
     
     ##############################################################################
     # Routes relevant to the menu item search page, which lists out the menu items belonging to a specific chain restaurant.
@@ -694,6 +704,8 @@ def create_app(db_name, testing=False):
             flash("Please sign in to see details for a specific menu item", "danger")
             return redirect("/")
         
+        session[GO_BACK_URL] = request.path
+        
         # returns a 404 error if the menu item isn't found in the database.
         item = Item.query.get_or_404(item_id)
         # Get all reviews for this menu item, newest first.
@@ -812,7 +824,8 @@ def create_app(db_name, testing=False):
         except:
             flash("Unable to delete review. There was trouble in connecting to/accessing the database. Please try again later.", "danger")
 
-        return redirect(f"/items/{item_id}")
+        redirect_url = request.referrer or "/"
+        return redirect(redirect_url)
     
     ##############################################################################
     @app.route('/')

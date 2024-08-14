@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %} Vouch4Food - Restaurant Reviews {% endblock %}
+
+{% block content %}
+
+<h1 class="display-1">{{g.user.get_full_name()}}'s Reviews for Restaurants ({{reviews.count()}})</h1>
+<hr>
+
+{% if reviews.count() == 0 %}
+  <p>You have not currently written any reviews for restaurants.</p>
+{% endif %}
+
+{% for review in reviews %}
+    <img src="{{review.restaurant.photo_url}}" alt="Photo of {{review.restaurant.name}}"/>
+    <p>Review of <a href="{{url_for('display_restaurant_page', restaurant_id=review.restaurant.id)}}">{{review.restaurant.name}}</a> at {{review.restaurant.address}}</p>
+
+    <h4 class="display-4">{{review.title}}</h4>
+    <p>{{review.content}}</p>
+
+    <form method="POST" action="{{url_for('delete_restaurant_review', restaurant_id=review.restaurant.id, review_id=review.id)}}">
+        <a class="btn btn-light" href="{{url_for('update_restaurant_review', restaurant_id=review.restaurant.id, review_id=review.id)}}">
+          Edit <i class="fa-solid fa-pencil"></i>
+        </a>
+        <button class="btn btn-danger">Delete</button>
+    </form>
+    
+    <hr>
+{% endfor %}
+
+{% endblock %}

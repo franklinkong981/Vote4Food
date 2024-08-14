@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %} Vouch4Food - Favorite Menu Items {% endblock %}
+
+{% block content %}
+
+<h1 class="display-1">{{g.user.get_full_name()}}'s Favorite Menu Items ({{number_favorites}})</h1>
+<hr>
+
+{% if number_favorites == 0 %}
+  <p>You don't have any currently favorited menu items.</p>
+{% endif %}
+
+{% for item in favorites %}
+    <img src="{{item.image_url}}" alt="Photo of {{item.title}}"/>
+    <h4 class="display-4"><a href="{{url_for('display_item_page', item_id=item.id)}}">{{item.title}}</a></h4><br>
+
+    <form method="POST" action="{{url_for('toggle_item_to_favorites', item_id=item.id)}}">
+        <button class="btn btn-primary">
+          Remove from Favorites <i class="fa-solid fa-star"></i> 
+        </button>
+    </form>
+
+    <p>From {{item.restaurant_chain or "N/A"}}</p>
+    <hr>
+{% endfor %}
+
+{% endblock %}
