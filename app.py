@@ -50,8 +50,7 @@ def create_app(db_name, testing=False):
     #Routes and view functions for the application.
 
     ##############################################################################
-    # Non-route functions, aka functions to be executed before/after each request, or functions that handle API calls, manipualate
-    # caches, etc.
+    # Functions for user authentication, aka signing up, logging in, and logging out. Also functions on g object.
 
     @app.before_request
     def add_user_to_g_object():
@@ -80,9 +79,6 @@ def create_app(db_name, testing=False):
         """Remove the previously logged in user's id from the Flask session to indicate no user is currently logged in."""
 
         del session[CURRENT_USER_KEY]
-
-    ##############################################################################
-    # Functions for user login/logout, as well as convenient access to logged in user information.
     
     @app.route('/signup', methods=['GET', 'POST'])
     def handle_signup():
@@ -168,6 +164,53 @@ def create_app(db_name, testing=False):
 
     ##############################################################################
     # Routes relevant to the logged in user, such as user profile information, user's reviews, and user's favorite restaurants/menu items.
+
+    @app.route('/users/favorites/restaurants')
+    def show_favorited_restaurants():
+        """Shows a list of the currently logged in user's favorited restaurant locations."""
+
+        if not g.user:
+            flash("Please sign in to view your favorited restaurants", "danger")
+            return redirect("/")
+        
+        return render_template("/users/favorites/restaurants", favorites=g.user.favorite_restaurants)
+    
+    @app.route('/users/favorite/items')
+    def show_favorited_items():
+        """Shows a list of the currently logged in user's favorited menu items."""
+
+        if not g.user:
+            flash("Please sign in to see your favorited menu items", "danger")
+            return redirect("/")
+        
+        return render_template("/users/favorites/items", favorites=g.user.favorite_items)
+    
+    @app.route('/users/reviews/restaurants')
+    def show_restaurant_reviews():
+        """Shows a list of the currently logged in user's reviews for restaurant locations."""
+
+        if not g.user:
+            flash("Please sign in to view your restaurant reviews", "danger")
+            return redirect("/")
+        
+        # get all of the logged in user's restaurant reviews, newest first.
+        restaurant_reviews = Restaurant_Review.query.filter(Restaurant_Review.author_id == g.user.id).order_by(desc(Restaurant_Review.created_at))
+
+        return render_template("/users/reviews/restaurants", reviews=restaurant_reviews)
+    
+    @app.route('/users/reviews/items')
+    def show_item_reviews():
+        """Shows a list of the currently logged in user's reviews for menu items."""
+
+        if not g.user:
+            flash("Please sign in to view your menu item reviews", "danger")
+            return redirect("/")
+        
+        # get all of the logged in user's menu item reviews, newest first.
+        item_reviews = Item_Review.query.filter(Item_Review.author_id == g.user.id).order_by(desc(Item_Review.created_at))
+
+        return render_template("/users/reviews/items", reviews=item_reviews)
+
 
     @app.route('/users/profile')
     def show_profile_info():
@@ -276,7 +319,7 @@ def create_app(db_name, testing=False):
                 flash("Unable to update location, the zip code you entered is not a registered US postal code. Please try again.", "danger")
                 print(f"ERROR: {exc}")
             except:
-                # Issue with connecting to SQLAlchemy database or Geoloation API.
+                # Issue with connecting to SQLAlchemy database or Geolocation API.
                 flash("There was an error in connecting/accessing the database/geolocation API. Please try again later.", "danger")
         
         return render_template("users/edit_location.html", form=form)
