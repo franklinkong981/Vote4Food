@@ -624,15 +624,22 @@ def create_app(db_name, testing=False):
     
     @app.route("/restaurants/<restaurant_id>/items")
     def show_menu_item_results(restaurant_id):
-        """Displays each item belonging to the restaurant with restaurant_id, each with a link to a page containing more information about that menu item."""
+        """Displays each item belonging to the restaurant with restaurant_id, each with a link to a page containing more information about that menu item.
+        The menu items are listed out in alphabetical order."""
 
         if not g.user:
             flash("Please sign in to search for menu items wihin a restaurant", "danger")
             return redirect("/")
         
         restaurant = Restaurant.query.get_or_404(restaurant_id)
+        menu_items = Item.query.filter(Item.restaurant_chain == restaurant.name).order_by(Item.title)
+        number_menu_items = Item.query.filter(Item.restaurant_chain == restaurant.name).count()
 
-        return render_template('/items/search.html', restaurant=restaurant, number_results=len(CURRENT_MENU_ITEMS), menu_item_results=CURRENT_MENU_ITEMS)
+        return render_template('/items/search.html', restaurant=restaurant, number_results=number_menu_items, menu_item_results=menu_items)
+
+    ##############################################################################
+    # Routes relevant to menu item pages, including adding/removing a menu item from the user's favorites and creating, editing, 
+    # and deleting a review for a menu item.
 
     ##############################################################################
     @app.route('/')

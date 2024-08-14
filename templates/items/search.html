@@ -6,7 +6,7 @@
 <a class="btn btn-secondary" href="{{url_for('display_restaurant_page', restaurant_id=restaurant.id)}}">Back</a>
 <h2 class="display-2">List of Menu Items Belonging to {{restaurant.name}}: {{number_results}} results</h2>
 
-{% if menu_item_results | count == 0 %}
+{% if number_menu_items == 0 %}
     <p>Sorry, there were no menu items found belonging to {{restaurant.name}}</p>
 {% endif %}
 
