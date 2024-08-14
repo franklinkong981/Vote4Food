@@ -29,6 +29,10 @@ class User(db.Model):
     def get_full_name(self):
         """Get first and last name of the user"""
         return self.first_name + " " + self.last_name
+    
+    def format_created_at(self):
+        """Turn the datetime created_at attribute into a more readable string."""
+        return self.created_at.strftime("%A, %m/%d/%Y at %I:%M%p")
 
     @classmethod
     def create_user(cls, first_name, last_name, email, user_image_url, password):

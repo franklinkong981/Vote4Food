@@ -13,7 +13,7 @@
 <p>First name: {{g.user.first_name}}</p>
 <p>Last name: {{g.user.last_name}}</p>
 <p>Email: {{g.user.email}}</p>
-<p>Account created at: {{g.user.created_at}}</p>
+<p>Account created at: {{g.user.format_created_at()}}</p>
 
 <a class="btn btn-info" href="{{url_for('update_profile_form')}}">Update Profile Information</a>
 <a class="btn btn-warning" href="{{url_for('update_password')}}">Update Password</a>

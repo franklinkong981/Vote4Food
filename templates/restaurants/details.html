@@ -51,7 +51,7 @@
     {% for review in restaurant_reviews %}
       <h4 class="display-4">{{review.title}}</h4>
       <p>{{review.content}}</p>
-      <p class="font-weight-light">By {{review.author.get_full_name()}}, created at {{review.created_at}}</p>
+      <p class="font-weight-light">By {{review.author.get_full_name()}}, created at {{review.format_created_at()}}</p>
       {% if review.author.id == g.user.id %}
         <br>
         <form method="POST" action="{{url_for('delete_restaurant_review', restaurant_id=restaurant.id, review_id=review.id)}}">

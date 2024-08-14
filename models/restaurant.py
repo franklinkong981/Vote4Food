@@ -93,6 +93,10 @@ class Restaurant_Review(db.Model):
     content = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
 
+    def format_created_at(self):
+        """Turn the datetime created_at attribute into a more readable string."""
+        return self.created_at.strftime("%A, %m/%d/%Y at %I:%M%p")
+
 class Restaurant_Favorite(db.Model):
     """A user can mark a specific restaurant location as a favorite and will be able to view a list of their favorite restaurant
     locations on the top navbar."""
