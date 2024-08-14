@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %} {{item.name}} Details {% endblock %}
+
+{% block content %}
+    <img src="{{item.image_url}}" alt="Photo of {{item.title}}"/>
+
+    <h1 class="display-1">{{item.title}}</h1><br>
+<!--
+    <form method="POST" action="{{url_for('toggle_restaurant_to_favorites', restaurant_id=restaurant.id)}}">
+        <button class="btn btn-primary">
+        {% if restaurant in g.user.favorite_restaurants %}
+          Remove from Favorites <i class="fa-solid fa-star"></i> 
+        {% else %}
+          Add to Favorites <i class="fa-regular fa-star"></i>
+        {% endif %}
+        </button>
+        <a class="btn btn-info" href="{{url_for('create_restaurant_review', restaurant_id=restaurant.id)}}">
+          Create a New Review <i class="fa-solid fa-comment"></i>
+        </a>
+    </form>
+-->
+    <h3 class="display-3">From {{item.restaurant_chain}}</h3>
+<!--
+    <h3 class="display-3">All Reviews ({{restaurant_reviews.count()}})</h3>
+    <hr>
+
+    {% if restaurant_reviews.count() == 0 %}
+      <p>There are no reviews currently for this restaurant. <a class="btn btn-link" href="{{url_for('create_restaurant_review', restaurant_id=restaurant.id)}}">Be the first to add one!</a></p>
+    {% endif %}
+    {% for review in restaurant_reviews %}
+      <h4 class="display-4">{{review.title}}</h4>
+      <p>{{review.content}}</p>
+      <p class="font-weight-light">By {{review.author.get_full_name()}}, created at {{review.created_at}}</p>
+      {% if review.author.id == g.user.id %}
+        <br>
+        <form method="POST" action="{{url_for('delete_restaurant_review', restaurant_id=restaurant.id, review_id=review.id)}}">
+          <a class="btn btn-light" href="{{url_for('update_restaurant_review', restaurant_id=restaurant.id, review_id=review.id)}}">
+            Edit <i class="fa-solid fa-pencil"></i>
+          </a>
+          <button class="btn btn-danger">Delete</button>
+        </form>
+
+      {% endif %}
+      <hr>
+    {% endfor %}
+-->
+{% endblock %}

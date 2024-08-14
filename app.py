@@ -640,7 +640,22 @@ def create_app(db_name, testing=False):
     ##############################################################################
     # Routes relevant to menu item pages, including adding/removing a menu item from the user's favorites and creating, editing, 
     # and deleting a review for a menu item.
+    
+    @app.route("/items/<int: item_id>")
+    def display_restaurant_page(item_id):
+        """Displays detailed information of a particular menu item. The page should have some information about the item. 
+        There should also be buttons/links for the user to add/remove the item from their favorites and for a user to create,
+        update, and delete their own reviews for the item."""
 
+        if not g.user:
+            flash("Please sign in to see details for a specific menu item", "danger")
+            return redirect("/")
+        
+        # returns a 404 error if the menu item isn't found in the database.
+        item = Item.query.get_or_404(item_id)
+
+        return render_template('/items/details.html', item=item)
+    
     ##############################################################################
     @app.route('/')
     def homepage():
