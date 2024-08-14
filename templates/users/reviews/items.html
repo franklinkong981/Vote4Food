@@ -17,6 +17,7 @@
 
     <h4 class="display-4">{{review.title}}</h4>
     <p>{{review.content}}</p>
+    <p class="font-weight-light">Created at {{review.created_at}}</p>
 
     <form method="POST" action="{{url_for('delete_item_review', item_id=review.item.id, review_id=review.id)}}">
         <a class="btn btn-light" href="{{url_for('update_item_review', item_id=review.item.id, review_id=review.id)}}">
