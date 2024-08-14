@@ -10,7 +10,7 @@ from sqlalchemy import desc
 
 from forms.authenticate_forms import SignUpForm, LoginForm
 from forms.profile_forms import EditProfileForm, ChangePasswordForm, SetLocationForm
-from forms.restaurant_forms import AddRestaurantReviewForm
+from forms.review_forms import ReviewForm
 
 from models.init_db import db
 from models.user import User
@@ -440,7 +440,7 @@ def create_app(db_name, testing=False):
             return redirect("/")
         
         restaurant = Restaurant.query.get_or_404(restaurant_id)
-        form = AddRestaurantReviewForm()
+        form = ReviewForm()
 
         if form.validate_on_submit():
             try:
@@ -477,7 +477,7 @@ def create_app(db_name, testing=False):
             redirect_url = request.referrer or "/"
             return redirect(redirect_url)
 
-        form = AddRestaurantReviewForm(obj=review)
+        form = ReviewForm(obj=review)
         if form.validate_on_submit():
             try:
                 review.title = form.title.data
