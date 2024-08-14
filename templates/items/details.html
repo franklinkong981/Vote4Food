@@ -21,4 +21,27 @@
         </a>
     </form>
 
+    <h3 class="display-3">All Reviews ({{item_reviews.count()}})</h3>
+    <hr>
+
+    {% if item_reviews.count() == 0 %}
+      <p>There are no reviews currently for this menu item. <a class="btn btn-link" href="{{url_for('create_item_review', item_id=item.id)}}">Be the first to add one!</a></p>
+    {% endif %}
+    {% for review in item_reviews %}
+      <h4 class="display-4">{{review.title}}</h4>
+      <p>{{review.content}}</p>
+      <p class="font-weight-light">By {{review.author.get_full_name()}}, created at {{review.created_at}}</p>
+      {% if review.author.id == g.user.id %}
+        <br>
+        <form method="POST" action="{{url_for('delete_item_review', item_id=item.id, review_id=review.id)}}">
+          <a class="btn btn-light" href="{{url_for('update_item_review', item_id=item.id, review_id=review.id)}}">
+            Edit <i class="fa-solid fa-pencil"></i>
+          </a>
+          <button class="btn btn-danger">Delete</button>
+        </form>
+
+      {% endif %}
+      <hr>
+    {% endfor %}
+
 {% endblock %}

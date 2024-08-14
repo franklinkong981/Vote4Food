@@ -653,8 +653,10 @@ def create_app(db_name, testing=False):
         
         # returns a 404 error if the menu item isn't found in the database.
         item = Item.query.get_or_404(item_id)
+        # Get all reviews for this menu item, newest first.
+        item_reviews = Item_Review.query.filter(Item_Review.item_id == item_id).order_by(desc(Item_Review.created_at))
 
-        return render_template('/items/details.html', item=item)
+        return render_template('/items/details.html', item=item, item_reviews=item_reviews)
     
     @app.route("/items/<int:item_id>/favorite", methods=["POST"])
     def toggle_item_to_favorites(item_id):
@@ -710,6 +712,64 @@ def create_app(db_name, testing=False):
                 flash("Unable to add review. There was trouble in connecting to/accessing the database. Please try again later.", "danger")
         
         return render_template("/items/add_review.html", item=item, form=form)
+    
+    @app.route("/items/<int:item_id>/reviews/<int:review_id>/update", methods=["GET", "POST"])
+    def update_item_review(item_id, review_id):
+        """Updates a particular review for a particular menu item as long as the review being updated was written by the 
+        logged in user currently updating it."""
+
+        if not g.user:
+            flash("Please sign in to edit your menu item reviews", "danger")
+            return redirect("/")
+        
+        item = Item.query.get_or_404(item_id)
+        review = Item_Review.query.get_or_404(review_id)
+        # Only allow users to edit their own menu item reviews
+        if review.author.id != g.user.id:
+            flash("You can only edit reviews that you created!", "danger")
+            redirect_url = request.referrer or "/"
+            return redirect(redirect_url)
+
+        form = ReviewForm(obj=review)
+        if form.validate_on_submit():
+            try:
+                review.title = form.title.data
+                review.content = form.content.data
+
+                db.session.commit()
+
+                flash(f"Review for {item.title} successfully updated", "success")
+                return redirect(f"/items/{item_id}")
+            except:
+                flash("Unable to edit review. There was trouble in connecting to/accessing the database. Please try again later.", "danger")
+
+        return render_template("/items/edit_review.html", item=item, form=form)
+    
+    @app.route("/items/<int:item_id>/reviews/<int:review_id>/delete", methods=["POST"])
+    def delete_item_review(item_id, review_id):
+        """Deletes a menu item review as long as it was written by the currently logged in user."""
+
+        if not g.user:
+            flash("Please sign in to delete your menu item reviews", "danger")
+            return redirect("/")
+        
+        item = Item.query.get_or_404(item_id)
+        review = Item_Review.query.get_or_404(review_id)
+        # Only allow users to delete their own menu item reviews
+        if review.author.id != g.user.id:
+            flash("You can only delete reviews that you created!", "danger")
+            redirect_url = request.referrer or "/"
+            return redirect(redirect_url)
+        
+        try:
+            db.session.delete(review)
+            db.session.commit()
+
+            flash(f"Your review for {item.title} was successfully deleted!", "success")
+        except:
+            flash("Unable to delete review. There was trouble in connecting to/accessing the database. Please try again later.", "danger")
+
+        return redirect(f"/items/{item_id}")
     
     ##############################################################################
     @app.route('/')
