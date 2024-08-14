@@ -525,11 +525,12 @@ def create_app(db_name, testing=False):
     # Keeps important information about menu items belonging to a particular chain restaurant so that results can easily be displayed.
     CURRENT_MENU_ITEMS = []
 
-    def store_all_menu_items(restaurant_id)
+    def store_all_menu_items(restaurant_id):
         """Stores all menu items belonging to a certain chain restaurant into the array CURRENT_MENU_ITEMS. It gets all menu items
         as JSON objects from the Spoonacular API and then extracts important information from each object, which it stores in another
         object and adds to the CURRENT_MENU_ITEMS array."""
 
+        CURRENT_MENU_ITEMS.clear()
         restaurant = Restaurant.query.get_or_404(restaurant_id)
         
         # Get total number of menu items in search results to see how many offsets you need to call to get JSON for all menu items.
@@ -551,11 +552,27 @@ def create_app(db_name, testing=False):
         while (offset * 100) < total_items:
             menu_items_raw = get_menu_items_only(restaurant_chain, offset)
             store_menu_items(menu_items_raw)
+            offset += 1
     
+    def store_menu_items(raw_menu_items_list):
+        """Extracts important information like name, etc. from each menu item (which is represented in JSON) in the raw_menu_items_list
+        and stores it in the CURRENT_MENU_ITEMS array."""
+
+        for item in raw_menu_items_list:
+            store_menu_item(item)
     
+    def store_menu_item(item):
+        """Item is an object that contains attributes of a specific menu item. This function extracts the id of the item, its name, 
+        the restaurant chain it belongs to, and the url for a photo of it. It wraps these attributes into an object and appends
+        the object to the CURRENT_MENU_ITEMS array."""
 
-
-
+        menu_item_data = {
+            'id': item['id'],
+            'title': item['title'],
+            'restaurant_chain': item['restaurantChain'] or None,
+            'image_url': item['image'] or None
+        }
+        CURRENT_MENU_ITEMS.append(menu_item_data)
 
     @app.route("/restaurants/<restaurant_id>/items/add", methods=["POST"])
     def add_menu_items_to_db(restaurant_id):
@@ -576,6 +593,18 @@ def create_app(db_name, testing=False):
             # Step 1 and 2
             store_all_menu_items(restaurant_id)
 
+            # Step 3
+            add_new_menu_items_to_db(CURRENT_MENU_ITEMS)
+            db.session.commit()
+
+            flash("New menu items successfully added to database","success")
+            return redirect(f"/restaurants/{restaurant_id}/items")
+        except:
+            flash("There was trouble connecting to the database and/or the Spoonacular API. Please try again later", "danger")
+        
+        redirect_url = request.referrer or "/"
+        return redirect(redirect_url)
+    
     @app.route("/restaurants/<restaurant_id>/items")
 
     ##############################################################################
