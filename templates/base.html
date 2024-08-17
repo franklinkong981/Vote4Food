@@ -16,16 +16,17 @@
         {% include "navbar.html" %}
         {% include "navbar-form.html" %}
 
-        <div class="container">
-            {% for category, message in get_flashed_messages(with_categories=True) %}
+        {% for category, message in get_flashed_messages(with_categories=True) %}
             <div class="alert alert-{{ category }}">{{ message }}</div>
-            {% endfor %}
+        {% endfor %}
+
+        <div class="main-container container-fluid d-flex flex-column justify-content-center">
 
             {% block content %}
             {% endblock %}
         
-            <hr>
-            <footer>
+            <footer class="mt-auto">
+                <hr>
                 <p>&copy; 2024, powered by PositionStack Geolocation API and Spoonacular API.</p>
             </footer>
         </div>

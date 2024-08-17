@@ -3,6 +3,10 @@
 {% block title %} Vouch 4 Your Favorite Menu Items! {% endblock %}
 
 {% block content %}
-    <h1>Welcome to Vouch4Food!</h1>
-    <h2>Here you can vouch for your favorite restaurant locations and menu items by leaving reviews and favoriting them!</h2>
+    <div class="text-center">
+        <h3 class="display-3">Welcome to Vouch4Food!</h1>
+        <h4 class="display-4">Review your favorite restaurants and menu items today!</h2>
+        <a class="btn btn-large btn-primary" href="{{url_for('handle_signup')}}">Get Started</a>
+        <a class="btn btn-secondary" href="{{url_for('handle_login')}}">Log In</a>
+    </div>
 {% endblock %}
