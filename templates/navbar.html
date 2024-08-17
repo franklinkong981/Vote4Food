@@ -1,0 +1,52 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light mx-auto">
+  <span class="navbar-brand mb-0 h1">Vouch 4 Food</span>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="{{url_for('homepage')}}">Home <i class="fa-solid fa-house"></i></a>
+      </li>
+      {% if not g.user %}
+        <li class="nav-item">
+          <a class="nav-link" href="{{url_for('handle_signup')}}">Sign Up</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{url_for('handle_login')}}">Log In</a>
+        </li>
+      {% else %}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" id="favoritesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Favorites
+          </a>
+          <div class="dropdown-menu" aria-labelledby="favoritesDropdown">
+            <a class="dropdown-item" href="{{url_for('show_favorited_restaurants')}}">Restaurants</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="{{url_for('show_favorited_items')}}">Menu Items</a>
+          </div>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" id="reviewsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Reviews
+          </a>
+          <div class="dropdown-menu" aria-labelledby="reviewsDropdown">
+            <a class="dropdown-item" href="{{url_for('show_restaurant_reviews')}}">Restaurants</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="{{url_for('show_item_reviews')}}">Menu Items</a>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{url_for('show_profile_info')}}">
+            <img class="navbar-image" src="{{ g.user.user_image_url }}" alt="{{ g.user.get_full_name() }}">
+            {{g.user.get_full_name()}}
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{url_for('handle_logout')}}">Log Out</a>
+        </li>
+      {% endif %}
+    </ul>
+  </div>
+</nav>

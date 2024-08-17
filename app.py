@@ -159,6 +159,8 @@ def create_app(db_name, testing=False):
             return redirect("/")
 
         logout_user()
+        # Empty the nearby restaurants array so when another user signs in, their nearby restaurants will be recalculated.
+        CURRENT_RESTAURANTS_NEARBY.clear()
         flash("Successfully logged out.", "success")
         return redirect("/")
 

@@ -1,7 +1,12 @@
-.auth-navbar {
-    background-color: red;
+.navbar-image {
+    display: inline-block;
+    margin-bottom: 2px;
+    margin-right: 5px;
+    width: 30px;
+    border-radius: 2px;
 }
 
 .user-profile-picture {
     width: 500px;
 }
+

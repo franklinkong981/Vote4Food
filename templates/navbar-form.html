@@ -1,0 +1,19 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  {% if g.user %}
+    <form class="w-100" action="{{url_for('add_restaurants_to_db')}}", method="post">
+      <div class="row">
+        <div class="col">
+          <input type="text" class="form-control" id="search-field" name="query" placeholder="Search Restaurants" required>
+        </div>
+        <div class="col">
+          <div class="form-group row">
+            <input type="number" class="form-control" id="zip-code-field" name="zip_code" placeholder="Zip Code" min="10000" max="99999">
+          </div>
+        </div>
+        <div class="col">
+          <button class="btn btn-success"><i class="fa-solid fa-magnifying-glass"></i></button>
+        </div>
+      </div>
+    </form>
+  {% endif %}
+</nav>
