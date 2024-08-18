@@ -15,10 +15,15 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+
+    background: linear-gradient(rgba(255,255,255,.6), rgba(255,255,255,.6)), url("/static/images/home-anon-background-image.jpg");
+    background-size: cover;
 }
 
 .home-anon-container {
     text-align: center;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 10px;
 }
 
 footer, .home-anon-container {
