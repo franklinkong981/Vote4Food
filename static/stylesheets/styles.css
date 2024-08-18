@@ -6,10 +6,6 @@
     border-radius: 2px;
 }
 
-.user-profile-picture {
-    width: 500px;
-}
-
 /* Styles for home-anon page. */
 
 .main-container {
@@ -67,4 +63,21 @@ footer, .home-anon-container {
     align-items: center;
 }
 
+/* Styles for profile page */
 
+.user-profile-picture {
+    width: 400px;
+}
+
+.profile-banner, .profile-info {
+    text-align: center;
+}
+
+.profile-banner {
+    margin-bottom: 5vh;
+}
+
+.profile-table-row {
+    display: flex;
+    justify-content: center;
+}
