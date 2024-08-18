@@ -31,6 +31,20 @@
 						<th scope="col">Account created at:</th>
 						<th scope="col">{{g.user.format_created_at()}}</th>
 					</tr>
+					{% if g.user.location_lat and g.user.location_long %}
+					<tr>
+						<th scope="col">Zip Code:</th>
+						<th scope="col">{{g.user.address_zip}}</th>
+					</tr>
+					<tr>
+						<th scope="col">Latitude:</th>
+						<th scope="col">{{g.user.location_lat}}</th>
+					</tr>
+					<tr>
+						<th scope="col">Longitude:</th>
+						<th scope="col">{{g.user.location_long}}</th>
+					</tr>
+					{% endif %}
 				</tbody>
 			</table>
 		</div>
@@ -39,25 +53,19 @@
 	<div class="welcome-links">
 		<a class="btn btn-info" href="{{url_for('update_profile_form')}}">Update Profile Information</a>
 		<a class="btn btn-warning" href="{{url_for('update_password')}}">Update Password</a>
+		{% if g.user.location_lat and g.user.location_long %}
+		<a class="btn btn-warning" href="{{url_for('update_location')}}">Update current location.</a>
+		{% else %}
+			<p>You do not yet have a current location.</p>
+			<a class="btn btn-warning" href="{{url_for('update_location')}}">Set current location.</a>
+		{% endif %}
 	</div>
 
 	<!--
-  <p>First name: {{g.user.first_name}}</p>
-  <p>Last name: {{g.user.last_name}}</p>
-  <p>Email: {{g.user.email}}</p>
-  <p>Account created at: {{g.user.format_created_at()}}</p>
-
-  <a class="btn btn-info" href="{{url_for('update_profile_form')}}">Update Profile Information</a>
-  <a class="btn btn-warning" href="{{url_for('update_password')}}">Update Password</a>
 
   {% if (not g.user.location_lat) and (not g.user.location_long) %}
     <p>You do not yet have a current location.</p>
     <a class="btn btn-warning" href="{{url_for('update_location')}}">Set current location.</a>
-  {% else %}
-    <p>Your current location:</p>
-    <p>Zip Code: {{g.user.address_zip}}</p>
-    <p>Longitude: {{g.user.location_long}}</p>
-    <p>Latitude: {{g.user.location_lat}}</p>
     <a class="btn btn-warning" href="{{url_for('update_location')}}">Update current location.</a>
   {% endif %}
 	-->

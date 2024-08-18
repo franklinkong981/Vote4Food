@@ -63,6 +63,17 @@ footer, .home-anon-container {
     align-items: center;
 }
 
+.restaurant-link:hover {
+    text-decoration: none;
+}
+
+.card-title {
+    color: green;
+}
+
+.card-text {
+    color: black;
+}
 /* Styles for profile page */
 
 .user-profile-picture {
