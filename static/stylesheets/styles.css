@@ -54,11 +54,11 @@ footer, .home-anon-container {
 
 /* Styles for logged in home page */
 
-.welcome-headline, .location-details {
+.welcome-headline, .welcome-links, .location-details {
     text-align: center;
 }
 
-.welcome-headline {
+.welcome-headline, .welcome-links {
     margin-bottom: 20px;
 }
 

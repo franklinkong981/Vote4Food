@@ -5,6 +5,12 @@
 {% block content %}
 
 <h2 class="welcome-headline display-2">Welcome, {{g.user.get_full_name()}}!</h2>
+<div class="welcome-links container-fluid">
+    <a class="btn btn-success" href="{{url_for('show_favorited_restaurants')}}">Your Favorite Restaurants</a>
+    <a class="btn btn-success" href="{{url_for('show_favorited_items')}}">Your Favorite Menu Items</a>
+    <a class="btn btn-info" href="{{url_for('show_restaurant_reviews')}}">Your Restaurant Reviews</a>
+    <a class="btn btn-info" href="{{url_for('show_item_reviews')}}">Your Menu Item Reviews</a>
+</div>
 
 <div class="location-details container-fluid">
     {% if (not g.user.location_lat) and (not g.user.location_long) %}
