@@ -10,6 +10,8 @@
     width: 500px;
 }
 
+/* Styles for home-anon page. */
+
 .main-container {
     min-height: 90vh;
     display: flex;
@@ -18,6 +20,7 @@
 
     background: linear-gradient(rgba(255,255,255,.6), rgba(255,255,255,.6)), url("/static/images/home-anon-background-image.jpg");
     background-size: cover;
+    background-repeat: no-repeat;
 }
 
 .home-anon-container {
@@ -26,6 +29,25 @@
     border-radius: 10px;
 }
 
+.welcome-page-buttons {
+    margin-bottom: 10px;
+}
+
 footer, .home-anon-container {
     margin-top: auto;
+}
+
+/* Styles for forms, including signup, login */
+
+.form-section {
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 10px;
+}
+
+.form-header {
+    text-align: center;
+}
+
+.form-buttons {
+    margin-bottom: 10px;
 }
