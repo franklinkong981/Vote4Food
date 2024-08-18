@@ -4,18 +4,23 @@
 
 {% block content %}
 
-<h1 class="display-1">Welcome Home!</h1>
+<h2 class="welcome-headline display-2">Welcome, {{g.user.get_full_name()}}!</h2>
 
-{% if (not g.user.location_lat) and (not g.user.location_long) %}
+<div class="location-details container-fluid">
+    {% if (not g.user.location_lat) and (not g.user.location_long) %}
     <p>You do not yet have a current location.</p>
     <a class="btn btn-warning" href="{{url_for('update_location')}}">Set current location.</a>
 {% else %}
-    <p>Your current location:</p>
+    <h5 class="display-5"><i class="fa-solid fa-location-dot"></i> Your current location:</h5>
     <p>Zip Code: {{g.user.address_zip}}</p>
     <p>Longitude: {{g.user.location_long}}</p>
     <p>Latitude: {{g.user.location_lat}}</p>
     <a class="btn btn-warning" href="{{url_for('update_location')}}">Update current location.</a>
+{% endif %}
+</div>
 
+
+{% if g.user.location_lat and g.user.location_long %}
     <h2 class="display-2">Restaurants Near You</h2><hr>
 
     {% if nearby_restaurants[0] == "NO RESTAURANTS NEARBY" %}

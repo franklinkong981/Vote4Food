@@ -51,3 +51,15 @@ footer, .home-anon-container {
 .form-buttons {
     margin-bottom: 10px;
 }
+
+/* Styles for logged in home page */
+
+.welcome-headline, .location-details {
+    text-align: center;
+}
+
+.welcome-headline {
+    margin-bottom: 20px;
+}
+
+
