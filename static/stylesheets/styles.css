@@ -54,12 +54,17 @@ footer, .home-anon-container {
 
 /* Styles for logged in home page */
 
-.welcome-headline, .welcome-links, .location-details {
+.welcome-headline, .welcome-links, .location-details, .nearby-restaurants-section {
     text-align: center;
 }
 
 .welcome-headline, .welcome-links {
     margin-bottom: 20px;
+}
+
+.restaurant-listings {
+    display: flex;
+    align-items: center;
 }
 
 

@@ -6,45 +6,51 @@
 
 <h2 class="welcome-headline display-2">Welcome, {{g.user.get_full_name()}}!</h2>
 <div class="welcome-links container-fluid">
-    <a class="btn btn-success" href="{{url_for('show_favorited_restaurants')}}">Your Favorite Restaurants</a>
-    <a class="btn btn-success" href="{{url_for('show_favorited_items')}}">Your Favorite Menu Items</a>
-    <a class="btn btn-info" href="{{url_for('show_restaurant_reviews')}}">Your Restaurant Reviews</a>
-    <a class="btn btn-info" href="{{url_for('show_item_reviews')}}">Your Menu Item Reviews</a>
+  <a class="btn btn-success" href="{{url_for('show_favorited_restaurants')}}">Your Favorite Restaurants</a>
+	<a class="btn btn-info" href="{{url_for('show_restaurant_reviews')}}">Your Restaurant Reviews</a>
+  <a class="btn btn-success" href="{{url_for('show_favorited_items')}}">Your Favorite Menu Items</a>
+  <a class="btn btn-info" href="{{url_for('show_item_reviews')}}">Your Menu Item Reviews</a>
 </div>
 
 <div class="location-details container-fluid">
-    {% if (not g.user.location_lat) and (not g.user.location_long) %}
-    <p>You do not yet have a current location.</p>
-    <a class="btn btn-warning" href="{{url_for('update_location')}}">Set current location.</a>
-{% else %}
-    <h5 class="display-5"><i class="fa-solid fa-location-dot"></i> Your current location:</h5>
-    <p>Zip Code: {{g.user.address_zip}}</p>
-    <p>Longitude: {{g.user.location_long}}</p>
-    <p>Latitude: {{g.user.location_lat}}</p>
-    <a class="btn btn-warning" href="{{url_for('update_location')}}">Update current location.</a>
-{% endif %}
+  {% if (not g.user.location_lat) and (not g.user.location_long) %}
+  	<p>You do not yet have a current location.</p>
+  	<a class="btn btn-warning" href="{{url_for('update_location')}}">Set current location.</a>
+	{% else %}
+  	<h5 class="display-5"><i class="fa-solid fa-location-dot"></i> Your current location:</h5>
+  	<p>Zip Code: {{g.user.address_zip}}</p>
+  	<p>Longitude: {{g.user.location_long}}</p>
+  	<p>Latitude: {{g.user.location_lat}}</p>
+  	<a class="btn btn-warning" href="{{url_for('update_location')}}">Update current location.</a>
+	{% endif %}
 </div>
 
+<div class="nearby-restaurants-section container-fluid">
+  {% if g.user.location_lat and g.user.location_long %}
+		<h2 class="display-2">Restaurants Near You</h2><hr>
 
-{% if g.user.location_lat and g.user.location_long %}
-    <h2 class="display-2">Restaurants Near You</h2><hr>
+		{% if nearby_restaurants[0] == "NO RESTAURANTS NEARBY" %}
+			<p>There are no recognized restaurants near your current location. Sorry!</p>
+		{% else %}
+			<div class="restaurant-listings row">
+				{% for restaurant in nearby_restaurants %}
+					<div class="restaurant-listing col-lg-4 col-md-6 col-12">
+						<a href="{{url_for('display_restaurant_page', restaurant_id=restaurant.id)}}" target="_blank">
+						<div class="restaurant-card card">
+							<img class="card-image-top" src="{{restaurant['photo_url']}}" alt="Photo of {{restaurant['name']}}"/>
+							<div class="card-body">
+								<h5 class="card-title">{{restaurant['name']}}</h5>
+								<p class="card-text"><i class="fa-solid fa-location-dot" title="address"></i> {{restaurant['address'] or "N/A"}}</p>
+								<p class="card-text"><i class="fa-solid fa-utensils" title="cuisines"></i> {{restaurant['cuisines'] or "N/A"}}</p>
+							</div>
+						</div>
+						</a>
+					</div>
+				{% endfor %}
+			</div>
+  	{% endif %}
 
-    {% if nearby_restaurants[0] == "NO RESTAURANTS NEARBY" %}
-        <p>There are no recognized restaurants near your current location. Sorry!</p>
-    {% else %}
-        {% for restaurant in nearby_restaurants %}
-            {% if restaurant['photo_url'] %}
-            <img src="{{restaurant['photo_url']}}" alt="Photo of {{restaurant['name']}}"/>
-            {% endif %}
-            <p>Name: <a href="{{url_for('display_restaurant_page', restaurant_id=restaurant.id)}}" target="_blank">{{restaurant['name']}}</a> </p>
-            <p>Address: {{restaurant['address'] or "N/A"}}</p>
-            <p>Cuisine(s): {{restaurant['cuisines'] or "N/A"}}</p>
-            <p>About: {{restaurant['description'] or "N/A"}}</p>
-    
-            <hr>
-        {% endfor %}
-    {% endif %}
-
-{% endif %}
+  {% endif %}
+</div>
 
 {% endblock %}
