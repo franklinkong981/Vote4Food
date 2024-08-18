@@ -4,8 +4,8 @@
 
 {% block content %}
 <div class="row justify-content-md-center">
-    <div class="col-md-4">
-      <h2 class="display-2">Edit Profile Information.</h2>
+    <div class="form-section col-md-10 col-lg-8">
+      <h2 class="form-header display-2">Edit Profile Information.</h2>
       <form method="POST">
         {{ form.hidden_tag() }}
 
@@ -31,9 +31,11 @@
         {% endif %}
         {{form.current_password.label}}
         {{form.current_password(class_="form-control")}}
-
-        <button class="btn btn-success">Update Profile</button>
-        <a href="{{url_for('show_profile_info')}}" class="btn btn-outline-secondary">Cancel</a>
+        
+        <div class="form-buttons">
+          <button class="btn btn-success">Update Profile</button>
+          <a href="{{url_for('show_profile_info')}}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
       </form>
     </div>
   </div>

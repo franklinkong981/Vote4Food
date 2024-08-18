@@ -4,8 +4,8 @@
 
 {% block content %}
 <div class="row justify-content-md-center">
-    <div class="col-md-4">
-      <h2 class="display-2">Change Your Location Below.</h2>
+    <div class="form-section col-md-10 col-lg-8">
+      <h2 class="form-header display-2">Change Your Location Below.</h2>
       <form method="POST">
         {{ form.hidden_tag() }}
 
@@ -18,9 +18,11 @@
             {{field(class_="form-control")}}
           </div>
         {% endfor %}
-
-        <button class="btn btn-success">Update Location</button>
-        <a href="{{g.back_url}}" class="btn btn-outline-secondary">Cancel</a>
+        
+        <div class="form-buttons">
+          <button class="btn btn-success">Update Location</button>
+          <a href="{{g.back_url}}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
       </form>
     </div>
   </div>
