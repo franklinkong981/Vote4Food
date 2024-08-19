@@ -58,7 +58,7 @@ footer, .home-anon-container {
     margin-bottom: 20px;
 }
 
-.restaurant-listings {
+.restaurant-listings, .favorited-restaurant-listings {
     display: flex;
     align-items: center;
 }
@@ -91,4 +91,10 @@ footer, .home-anon-container {
 .profile-table-row {
     display: flex;
     justify-content: center;
+}
+
+/* Styles for nav favorites/reviews */
+
+.favorite-listings {
+    text-align: center;
 }

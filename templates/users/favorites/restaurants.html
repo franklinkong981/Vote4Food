@@ -4,26 +4,38 @@
 
 {% block content %}
 
-<h1 class="display-1">{{g.user.get_full_name()}}'s Favorite Restaurants ({{number_favorites}})</h1>
+<div class="profile-banner container-fluid">
+  <h1 class="display-1">{{g.user.get_full_name()}}'s Favorite Restaurants ({{number_favorites}})</h1>
+</div>
+
 <hr>
 
-{% if number_favorites == 0 %}
-  <p>You don't have any currently favorited restaurants.</p>
-{% endif %}
-
-{% for restaurant in favorites %}
-    <img src="{{restaurant.photo_url}}" alt="Photo of {{restaurant.name}}"/>
-    <h4 class="display-4"><a href="{{url_for('display_restaurant_page', restaurant_id=restaurant.id)}}">{{restaurant.name}}</a></h4><br>
-
-    <form method="POST" action="{{url_for('toggle_restaurant_to_favorites', restaurant_id=restaurant.id)}}">
-        <button class="btn btn-primary">
-          Remove from Favorites <i class="fa-solid fa-star"></i> 
-        </button>
-    </form>
-
-    <p><i class="fa-solid fa-location-dot" title="address"></i> {{restaurant.address or "N/A"}}</p>
-    <p><i class="fa-solid fa-utensils" title="cuisines"></i> {{restaurant.cuisines or "N/A"}}</p>
-    <hr>
-{% endfor %}
+<div class="favorite-listings container-fluid">
+  {% if number_favorites == 0 %}
+    <p>You don't have any currently favorited restaurants.</p>
+  {% else %}
+    <div class="favorited-restaurant-listings row">
+      {% for restaurant in favorites %}
+        <div class="favorited-restaurant-listing col-lg-4 col-md-6 col-12">
+          <a class="restaurant-link" href="{{url_for('display_restaurant_page', restaurant_id=restaurant.id)}}" target="_blank">
+          <div class="restaurant-card card">
+            <img class="card-image-top" src="{{restaurant['photo_url']}}" alt="Photo of {{restaurant['name']}}"/>
+            <div class="card-body">
+              <h5 class="card-title">{{restaurant['name']}}</h5>
+              <p class="card-text"><i class="fa-solid fa-location-dot" title="address"></i> {{restaurant['address'] or "N/A"}}</p>
+              <p class="card-text"><i class="fa-solid fa-utensils" title="cuisines"></i> {{restaurant['cuisines'] or "N/A"}}</p>
+              <form method="POST" action="{{url_for('toggle_restaurant_to_favorites', restaurant_id=restaurant.id)}}">
+                <button class="btn btn-primary">
+                  Remove from Favorites <i class="fa-solid fa-star"></i> 
+                </button>
+              </form>
+            </div>
+          </div>
+          </a>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>
 
 {% endblock %}
