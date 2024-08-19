@@ -4,25 +4,39 @@
 
 {% block content %}
 
-<h1 class="display-1">{{g.user.get_full_name()}}'s Favorite Menu Items ({{number_favorites}})</h1>
+<div class="profile-banner container-fluid">
+  <h1 class="display-1">{{g.user.get_full_name()}}'s Favorite Menu Items ({{number_favorites}})</h1>
+</div>
+
 <hr>
 
-{% if number_favorites == 0 %}
-  <p>You don't have any currently favorited menu items.</p>
-{% endif %}
-
-{% for item in favorites %}
-    <img src="{{item.image_url}}" alt="Photo of {{item.title}}"/>
-    <h4 class="display-4"><a href="{{url_for('display_item_page', item_id=item.id)}}">{{item.title}}</a></h4><br>
-
-    <form method="POST" action="{{url_for('toggle_item_to_favorites', item_id=item.id)}}">
-        <button class="btn btn-primary">
-          Remove from Favorites <i class="fa-solid fa-star"></i> 
-        </button>
-    </form>
-
-    <p>From {{item.restaurant_chain or "N/A"}}</p>
-    <hr>
-{% endfor %}
+<div class="favorite-listings container-fluid">
+  {% if number_favorites == 0 %}
+    <p>You don't have any currently favorited menu items.</p>
+  {% else %}
+    <div class="favorited-item-listings row">
+      {% for item in favorites %}
+        <div class="favorited-item-listing col-lg-4 col-md-6 col-12">
+          <a class="item-link" href="{{url_for('display_item_page', item_id=item.id)}}">
+          <div class="item-card card">
+            <img class="card-image-top" src="{{item['image_url']}}" alt="Photo of {{item['title']}}"/>
+            <div class="card-body">
+              <h5 class="card-title">{{item['title']}}</h5>
+              {% if item.restaurant_chain %}
+                <p class="card-text">From {{item.restaurant_chain}}</p>
+              {% endif %}
+              <form method="POST" action="{{url_for('toggle_item_to_favorites', item_id=item.id)}}">
+                <button class="btn btn-primary">
+                  Remove from Favorites <i class="fa-solid fa-star"></i> 
+                </button>
+              </form>
+            </div>
+          </div>
+          </a>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>
 
 {% endblock %}

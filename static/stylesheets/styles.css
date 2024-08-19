@@ -6,8 +6,6 @@
     border-radius: 2px;
 }
 
-/* Styles for home-anon page. */
-
 .main-container {
     min-height: 90vh;
     display: flex;
@@ -33,8 +31,6 @@ footer, .home-anon-container {
     margin-top: auto;
 }
 
-/* Styles for forms, including signup, login */
-
 .form-section {
     background: rgba(255, 255, 255, 0.6);
     border-radius: 10px;
@@ -48,8 +44,6 @@ footer, .home-anon-container {
     margin: 10px 0;
 }
 
-/* Styles for logged in home page */
-
 .welcome-headline, .welcome-links, .location-details, .nearby-restaurants-section {
     text-align: center;
 }
@@ -58,7 +52,7 @@ footer, .home-anon-container {
     margin-bottom: 20px;
 }
 
-.restaurant-listings, .favorited-restaurant-listings {
+.restaurant-listings, .favorited-restaurant-listings, .favorited-item-listings {
     display: flex;
     align-items: center;
 }
@@ -74,7 +68,6 @@ footer, .home-anon-container {
 .card-text {
     color: black;
 }
-/* Styles for profile page */
 
 .user-profile-picture {
     width: 400px;
@@ -92,8 +85,6 @@ footer, .home-anon-container {
     display: flex;
     justify-content: center;
 }
-
-/* Styles for nav favorites/reviews */
 
 .favorite-listings {
     text-align: center;

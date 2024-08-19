@@ -17,7 +17,7 @@
     <div class="favorited-restaurant-listings row">
       {% for restaurant in favorites %}
         <div class="favorited-restaurant-listing col-lg-4 col-md-6 col-12">
-          <a class="restaurant-link" href="{{url_for('display_restaurant_page', restaurant_id=restaurant.id)}}" target="_blank">
+          <a class="restaurant-link" href="{{url_for('display_restaurant_page', restaurant_id=restaurant.id)}}">
           <div class="restaurant-card card">
             <img class="card-image-top" src="{{restaurant['photo_url']}}" alt="Photo of {{restaurant['name']}}"/>
             <div class="card-body">
