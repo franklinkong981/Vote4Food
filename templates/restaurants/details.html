@@ -3,47 +3,108 @@
 {% block title %} {{restaurant.name}} Details {% endblock %}
 
 {% block content %}
-    <img src="{{restaurant.photo_url}}" alt="Photo of {{restaurant.name}}"/>
 
-    <h1 class="display-1">{{restaurant.name}}</h1><br>
+  <div class="banner container-fluid">
+    <img class="main-picture" src="{{restaurant.photo_url}}" alt="Photo of {{restaurant.name}}"/>
+    <h1 class="display-1">{{restaurant.name}}</h1>
+  </div>
 
+  <div class="restaurant-buttons">
     <form method="POST" action="{{url_for('toggle_restaurant_to_favorites', restaurant_id=restaurant.id)}}">
-        <button class="btn btn-primary">
-        {% if restaurant in g.user.favorite_restaurants %}
-          Remove from Favorites <i class="fa-solid fa-star"></i> 
-        {% else %}
-          Add to Favorites <i class="fa-regular fa-star"></i>
-        {% endif %}
-        </button>
-        <a class="btn btn-info" href="{{url_for('create_restaurant_review', restaurant_id=restaurant.id)}}">
-          Create a New Review <i class="fa-solid fa-comment"></i>
-        </a>
+      <button class="btn btn-primary">
+      {% if restaurant in g.user.favorite_restaurants %}
+        Remove from Favorites <i class="fa-solid fa-star"></i> 
+      {% else %}
+        Add to Favorites <i class="fa-regular fa-star"></i>
+      {% endif %}
+      </button>
+      <a class="btn btn-info" href="{{url_for('create_restaurant_review', restaurant_id=restaurant.id)}}">
+        Create a New Review <i class="fa-solid fa-comment"></i>
+      </a>
     </form>
-
-    <p><i class="fa-solid fa-location-dot" title="address"></i> {{restaurant.address or "N/A"}}</p>
-    <p><i class="fa-solid fa-globe" title="coordinates"></i> Latitude: {{restaurant.latitude}} Longitude: {{restaurant.longitude}}</p>
-    <p><i class="fa-solid fa-phone" title="phone-number"></i> {{restaurant.phone or "N/A"}}</p>
-
-    <p><i class="fa-solid fa-circle-info" title="description"></i> {{restaurant.description or "N/A"}}</p>
-    <p><i class="fa-solid fa-utensils" title="cuisines"></i> {{restaurant.cuisines or "N/A"}}</p>
-
-    <form method="POST" action="{{url_for('add_menu_items_to_db', restaurant_id=restaurant.id)}}">
+    <form class="see-menu-button" method="POST" action="{{url_for('add_menu_items_to_db', restaurant_id=restaurant.id)}}">
       <button class="btn btn-secondary">See Menu Items Recognized from this Restaurant</button>
     </form>
+  </div>
 
-    <h3 class="display-3">Hours:</h3>
-    <ul>
-        <li>Sunday: {{restaurant.sunday_hours or "N/A"}}</li>
-        <li>Monday: {{restaurant.monday_hours or "N/A"}}</li>
-        <li>Tuesday: {{restaurant.tuesday_hours or "N/A"}}</li>
-        <li>Wednesday: {{restaurant.wednesday_hours or "N/A"}}</li>
-        <li>Thursday: {{restaurant.thursday_hours or "N/A"}}</li>
-        <li>Friday: {{restaurant.friday_hours or "N/A"}}</li>
-        <li>Saturday: {{restaurant.saturday_hours or "N/A"}}</li>
-    </ul>
+  <div class="restaurant-info container-fluid">
+    <h4 class="display-4">Restaurant Information</h4>
+  
+    <div class="restaurant-table-row row">
+      <div class="col-lg-8 col-md-10 col-12">
+        <table class="restaurant-table table table-striped">
+          <tbody>
+            <tr>
+              <th scope="col"><i class="fa-solid fa-location-dot" title="address"></i> Address</th>
+              <th scope="col">{{restaurant.address or "N/A"}}</th>
+            </tr>
+            <tr>
+              <th scope="col"><i class="fa-solid fa-globe" title="coordinates"></i> Coordinates</th>
+              <th scope="col">Latitude: {{restaurant.latitude}} Longitude: {{restaurant.longitude}}</th>
+            </tr>
+            <tr>
+              <th scope="col"><i class="fa-solid fa-phone" title="phone-number"></i> Phone</th>
+              <th scope="col">{{restaurant.phone or "N/A"}}</th>
+            </tr>
+            <tr>
+              <th scope="col"><i class="fa-solid fa-circle-info" title="description"></i> Details</th>
+              <th scope="col">{{restaurant.description or "N/A"}}</th>
+            </tr>
+            <tr>
+              <th scope="col"><i class="fa-solid fa-utensils" title="cuisines"></i> Cuisines</th>
+              <th scope="col">{{restaurant.cuisines or "N/A"}}</th>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <h4 class="display-4">Hours</h4>
+
+    <div class="restaurant-hours-table-row row">
+      <div class="col-lg-6 col-md-9 col-12">
+        <table class="restaurant-table table table-striped">
+          <tbody>
+            <tr>
+              <th scope="col">Sunday</th>
+              <th scope="col">{{restaurant.sunday_hours or "N/A"}}</th>
+            </tr>
+            <tr>
+              <th scope="col">Monday</th>
+              <th scope="col">{{restaurant.monday_hours or "N/A"}}</th>
+            </tr>
+            <tr>
+              <th scope="col">Tuesday</th>
+              <th scope="col">{{restaurant.tuesday_hours or "N/A"}}</th>
+            </tr>
+            <tr>
+              <th scope="col">Wednesday</th>
+              <th scope="col">{{restaurant.wednesday_hours or "N/A"}}</th>
+            </tr>
+            <tr>
+              <th scope="col">Thursday</th>
+              <th scope="col">{{restaurant.thursday_hours or "N/A"}}</th>
+            </tr>
+            <tr>
+              <th scope="col">Friday</th>
+              <th scope="col">{{restaurant.friday_hours or "N/A"}}</th>
+            </tr>
+            <tr>
+              <th scope="col">Saturday</th>
+              <th scope="col">{{restaurant.saturday_hours or "N/A"}}</th>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+
 
     <h3 class="display-3">All Reviews ({{restaurant_reviews.count()}})</h3>
     <hr>
+  
 
     {% if restaurant_reviews.count() == 0 %}
       <p>There are no reviews currently for this restaurant. <a class="btn btn-link" href="{{url_for('create_restaurant_review', restaurant_id=restaurant.id)}}">Be the first to add one!</a></p>

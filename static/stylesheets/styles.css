@@ -69,11 +69,11 @@ footer, .home-anon-container {
     color: black;
 }
 
-.user-profile-picture {
+.main-picture {
     width: 400px;
 }
 
-.profile-banner, .profile-info {
+.banner, .profile-info, .restaurant-info {
     text-align: center;
 }
 
@@ -81,11 +81,20 @@ footer, .home-anon-container {
     margin-bottom: 5vh;
 }
 
-.profile-table-row {
+.profile-table-row, .restaurant-table-row, .restaurant-hours-table-row {
     display: flex;
     justify-content: center;
 }
 
 .favorite-listings {
     text-align: center;
+}
+
+.restaurant-buttons {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.see-menu-button {
+    margin-top: 10px;
 }

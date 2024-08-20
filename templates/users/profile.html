@@ -5,7 +5,7 @@
 {% block content %}
 
 <div class="banner container-fluid">
-  <img class="user-profile-picture" src="{{g.user.user_image_url}}" alt="{{g.user.get_full_name()}}'s profile picture"/>
+  <img class="main-picture" src="{{g.user.user_image_url}}" alt="{{g.user.get_full_name()}}'s profile picture"/>
 </div>
 
 <div class="profile-info container-fluid">
@@ -60,15 +60,6 @@
 			<a class="btn btn-warning" href="{{url_for('update_location')}}">Set current location.</a>
 		{% endif %}
 	</div>
-
-	<!--
-
-  {% if (not g.user.location_lat) and (not g.user.location_long) %}
-    <p>You do not yet have a current location.</p>
-    <a class="btn btn-warning" href="{{url_for('update_location')}}">Set current location.</a>
-    <a class="btn btn-warning" href="{{url_for('update_location')}}">Update current location.</a>
-  {% endif %}
-	-->
 </div>
 
 {% endblock %}
