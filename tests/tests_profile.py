@@ -101,7 +101,54 @@ class ProfileTestCase(TestCase):
       self.assertIn('<p>You do not yet have a current location.</p>', html)
       self.assertIn('Set current location.', html)
 
-
   # Edit profile tests
+
+  def test_logged_out_update_profile_page(self):
+    """When a logged out user tries to  access the update profile page, are they redirected to the homepage?"""
+
+    with self.client as c:
+      resp = c.get("/users/profile/update")
+
+      self.assertEqual(resp.status_code, 302)
+      self.assertEqual(resp.location, "/")
+  
+  def test_logged_in_update_profile_page(self):
+    """When a logged in user accesses the update profile page, do they see the appropriate form?"""
+
+    user_ted = User.query.filter(User.first_name == 'Ted').first()
+
+    with self.client as c:
+      # simulate user_ted logging in
+      with c.session_transaction() as sess:
+        sess[CURRENT_USER_KEY] = user_ted.id
+      
+      resp = c.get("/users/profile/update")
+      html = resp.get_data(as_text=True)
+
+      self.assertEqual(resp.status_code, 200)
+      self.assertIn('<h2 class="form-header display-2">Edit Profile Information.</h2>', html)
+      self.assertIn('<p>To confirm changes, enter your current password:</p>', html)
+      self.assertIn('<button class="btn btn-success">Update Profile</button>', html)
+  
+  def test_update_profile(self):
+    """When a user updates their profile with valid information, is their information appropriately updated?"""
+
+    user_ted = User.query.filter(User.first_name == 'Ted').first()
+    user_ted_id = user_ted.id
+
+    with self.client as c:
+      # simulate user_ted logging in
+      with c.session_transaction() as sess:
+        sess[CURRENT_USER_KEY] = user_ted.id
+      
+      resp = c.post("/users/profile/update", data={"first_name": "Fred", "last_name": "Abigail", "email": "teddybear@gmail.com", "user_image_url": "www.testurl1.com", "current_password": "PASSWORD1"})
+
+      self.assertEqual(resp.status_code, 302)
+      self.assertEqual(resp.location, "/users/profile")
+
+      # Was the information changed?
+      user_fred = User.query.filter(User.first_name == 'Fred').first()
+      self.assertEqual(user_fred.id, user_ted_id)
+
 
   # Change password tests
