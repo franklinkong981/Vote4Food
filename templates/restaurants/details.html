@@ -109,9 +109,9 @@
       <p>There are no reviews currently for this restaurant. <a class="btn btn-success" href="{{url_for('create_restaurant_review', restaurant_id=restaurant.id)}}">Be the first to add one!</a></p>
     {% endif %}
 
-    {% for review in restaurant_reviews %}
     <div class="restaurant-review-row row">
       <div class="col-lg-8 col-md-10 col-12">
+        {% for review in restaurant_reviews %}
         <div class="restaurant-review">
           <div class="review-byline">
             <p class="font-weight-light">By {{review.author.get_full_name()}}, created at {{review.format_created_at()}}</p>
@@ -128,8 +128,8 @@
           {% endif %}
         </div>
       </div>
+      {% endfor %}
     </div>
-    {% endfor %}
   </div>
 
 <!--
