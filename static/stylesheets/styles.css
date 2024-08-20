@@ -73,7 +73,7 @@ footer, .home-anon-container {
     width: 400px;
 }
 
-.banner, .profile-info, .restaurant-info, .restaurant-reviews {
+.banner, .profile-info, .restaurant-info, .restaurant-reviews, .item-reviews {
     text-align: center;
 }
 
@@ -81,7 +81,7 @@ footer, .home-anon-container {
     margin-bottom: 5vh;
 }
 
-.profile-table-row, .restaurant-table-row, .restaurant-hours-table-row, .restaurant-review-row {
+.profile-table-row, .restaurant-table-row, .restaurant-hours-table-row, .restaurant-review-row, .item-review-row {
     display: flex;
     justify-content: center;
 }
@@ -90,7 +90,7 @@ footer, .home-anon-container {
     text-align: center;
 }
 
-.restaurant-buttons {
+.restaurant-buttons, .item-buttons {
     text-align: center;
     margin-bottom: 10px;
 }
@@ -99,7 +99,7 @@ footer, .home-anon-container {
     margin-top: 10px;
 }
 
-.restaurant-review {
+.restaurant-review, .item-review {
     background-color: lightgray;
     border-radius: 10px;
     text-align: left;
@@ -107,7 +107,7 @@ footer, .home-anon-container {
     margin-bottom: 10px;
 }
 
-.review-byline {
+.review-byline, .item-byline {
     display: flex;
     justify-content: flex-end;
 }
