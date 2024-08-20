@@ -33,18 +33,20 @@ def create_app(db_name, testing=False):
     database for unit/integration testing purposes doesn't interfere with actual database for production."""
     app = Flask(__name__)
     app.testing = testing
-    # Get DB_URI from environ variable (useful for production/testing) or,
-    # if not set there, use development local db.
-    app.config['SQLALCHEMY_DATABASE_URI'] = (os.environ.get('DATABASE_URL', f'postgresql:///{db_name}'))
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "it's a secret")
     app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
     toolbar = DebugToolbarExtension(app)
     if app.testing:
+        # Database used for testing is local, not development/production database on Supabase.
+        app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql:///{db_name}'
         app.config['SQLALCHEMY_ECHO'] = False
         app.config['DEBUG_TB_HOSTS'] = ['dont-show-debug-toolbar']
         app.config['WTF_CSRF_ENABLED'] = False
     else:
+        # Get DB_URI from environ variable (useful for production/testing) or,
+        # if not set there, use development local db.
+        app.config['SQLALCHEMY_DATABASE_URI'] = (os.environ.get('DATABASE_URL', f'postgresql:///{db_name}'))
         app.config['SQLALCHEMY_ECHO'] = True
     
     #Routes and view functions for the application.
