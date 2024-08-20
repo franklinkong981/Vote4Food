@@ -12,7 +12,7 @@
     flex-direction: column;
     justify-content: center;
 
-    background: linear-gradient(rgba(255,255,255,.6), rgba(255,255,255,.6)), url("/static/images/home-anon-background-image.jpg");
+    background: linear-gradient(rgba(255,255,255,.75), rgba(255,255,255,.75)), url("/static/images/home-anon-background-image.jpg");
     background-size: cover;
     background-repeat: no-repeat;
 }
@@ -73,7 +73,7 @@ footer, .home-anon-container {
     width: 400px;
 }
 
-.banner, .profile-info, .restaurant-info {
+.banner, .profile-info, .restaurant-info, .restaurant-reviews {
     text-align: center;
 }
 
@@ -81,7 +81,7 @@ footer, .home-anon-container {
     margin-bottom: 5vh;
 }
 
-.profile-table-row, .restaurant-table-row, .restaurant-hours-table-row {
+.profile-table-row, .restaurant-table-row, .restaurant-hours-table-row, .restaurant-review-row {
     display: flex;
     justify-content: center;
 }
@@ -97,4 +97,17 @@ footer, .home-anon-container {
 
 .see-menu-button {
     margin-top: 10px;
+}
+
+.restaurant-review {
+    background-color: lightgray;
+    border-radius: 10px;
+    text-align: left;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.review-byline {
+    display: flex;
+    justify-content: flex-end;
 }

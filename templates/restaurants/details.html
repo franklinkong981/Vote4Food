@@ -101,14 +101,38 @@
   </div>
 
 
-
-    <h3 class="display-3">All Reviews ({{restaurant_reviews.count()}})</h3>
+  <div class="restaurant-reviews container-fluid">
     <hr>
-  
+    <h3 class="display-3">All Reviews ({{restaurant_reviews.count()}})</h3>
 
     {% if restaurant_reviews.count() == 0 %}
-      <p>There are no reviews currently for this restaurant. <a class="btn btn-link" href="{{url_for('create_restaurant_review', restaurant_id=restaurant.id)}}">Be the first to add one!</a></p>
+      <p>There are no reviews currently for this restaurant. <a class="btn btn-success" href="{{url_for('create_restaurant_review', restaurant_id=restaurant.id)}}">Be the first to add one!</a></p>
     {% endif %}
+
+    {% for review in restaurant_reviews %}
+    <div class="restaurant-review-row row">
+      <div class="col-lg-8 col-md-10 col-12">
+        <div class="restaurant-review">
+          <div class="review-byline">
+            <p class="font-weight-light">By {{review.author.get_full_name()}}, created at {{review.format_created_at()}}</p>
+          </div>
+          <h4 class="display-4">{{review.title}}</h4>
+          <p>{{review.content}}</p>
+          {% if review.author.id == g.user.id %}
+            <form method="POST" action="{{url_for('delete_restaurant_review', restaurant_id=restaurant.id, review_id=review.id)}}">
+              <a class="btn btn-light" href="{{url_for('update_restaurant_review', restaurant_id=restaurant.id, review_id=review.id)}}">
+                Edit <i class="fa-solid fa-pencil"></i>
+              </a>
+              <button class="btn btn-danger">Delete</button>
+            </form>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+<!--
     {% for review in restaurant_reviews %}
       <h4 class="display-4">{{review.title}}</h4>
       <p>{{review.content}}</p>
@@ -125,5 +149,6 @@
       {% endif %}
       <hr>
     {% endfor %}
+      -->
 
 {% endblock %}
