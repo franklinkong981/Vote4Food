@@ -52,12 +52,12 @@ footer, .home-anon-container {
     margin-bottom: 20px;
 }
 
-.restaurant-listings, .favorited-restaurant-listings, .favorited-item-listings {
+.restaurant-listings, .favorited-restaurant-listings, .item-listings, .favorited-item-listings {
     display: flex;
     align-items: center;
 }
 
-.restaurant-link:hover {
+.restaurant-link:hover, .item-link:hover {
     text-decoration: none;
 }
 
@@ -110,4 +110,8 @@ footer, .home-anon-container {
 .review-byline {
     display: flex;
     justify-content: flex-end;
+}
+
+.back-button {
+    margin: 10px;
 }

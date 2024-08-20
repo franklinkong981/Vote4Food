@@ -3,20 +3,33 @@
 {% block title %} Menu Items in {{restaurant.name}} {% endblock %}
 
 {% block content %}
-<a class="btn btn-secondary" href="{{url_for('display_restaurant_page', restaurant_id=restaurant.id)}}">Back</a>
-<h2 class="display-2">List of Menu Items Belonging to {{restaurant.name}}: {{number_results}} results</h2>
+<div class="back-button">
+  <a class="btn btn-secondary" href="{{url_for('display_restaurant_page', restaurant_id=restaurant.id)}}"><i class="fa-solid fa-arrow-left"></i> Back</a>
+</div>
+<div class="banner container-fluid">
+  <h2 class="display-2">List of Menu Items Belonging to {{restaurant.name}}: {{number_results}} results</h2>
+</div>
 
-{% if number_menu_items == 0 %}
-    <p>Sorry, there were no menu items found belonging to {{restaurant.name}}</p>
-{% endif %}
+<div class="search-results-section container-fluid">
+	{% if number_menu_items == 0 %}
+  	<p>Sorry, there were no menu items found belonging to {{restaurant.name}}</p>
+	{% else %}
+			<div class="item-listings row">
+				{% for item in menu_item_results %}
+					<div class="item-listing col-lg-4 col-md-6 col-12">
+						<a class="item-link" href="{{url_for('display_item_page', item_id=item.id)}}" target="_blank">
+							<div class="item-card card">
+								<img class="card-image-top" src="{{item['image_url']}}" alt="Photo of {{item['title']}}"/>
+								<div class="card-body">
+									<h5 class="card-title">{{item['title']}}</h5>
+								</div>
+							</div>
+						</a>
+					</div>
+				{% endfor %}
+			</div>
 
-{% for item in menu_item_results %}
-    {% if item['image_url'] %}
-        <img src="{{item['image_url']}}" alt="Photo of {{item['title']}}"/>
-    {% endif %}
-    <p><a href="{{url_for('display_item_page', item_id=item.id)}}" target="_blank">{{item['title']}}</a> </p>
-
-    <hr>
-{% endfor %}
+  {% endif %}
+</div>
 
 {% endblock %}
