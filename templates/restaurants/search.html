@@ -3,22 +3,32 @@
 {% block title %} Vouch4Food - Restaurant Search Results {% endblock %}
 
 {% block content %}
-<h2 class="display-2">Search Results: {{number_results}} results</h2>
+<div class="banner container-fluid">
+  <h2 class="display-2">Search Results: {{number_results}} results</h2>
+</div>
 
-{% if restaurant_results | count == 0 %}
-    <p>Sorry, there were no restaurants matching your search near the zip code you entered.</p>
-{% endif %}
+<div class="search-results-section container-fluid">
+	{% if restaurant_results | count == 0 %}
+		<p>Sorry, there were no restaurants matching your search near the zip code you entered.</p>
+	{% else %}
+			<div class="restaurant-listings row">
+				{% for restaurant in restaurant_results %}
+					<div class="restaurant-listing col-lg-4 col-md-6 col-12">
+						<a class="restaurant-link" href="{{url_for('display_restaurant_page', restaurant_id=restaurant.id)}}" target="_blank">
+						<div class="restaurant-card card">
+							<img class="card-image-top" src="{{restaurant['photo_url']}}" alt="Photo of {{restaurant['name']}}"/>
+							<div class="card-body">
+								<h5 class="card-title">{{restaurant['name']}}</h5>
+								<p class="card-text"><i class="fa-solid fa-location-dot" title="address"></i> {{restaurant['address'] or "N/A"}}</p>
+								<p class="card-text"><i class="fa-solid fa-utensils" title="cuisines"></i> {{restaurant['cuisines'] or "N/A"}}</p>
+							</div>
+						</div>
+						</a>
+					</div>
+				{% endfor %}
+			</div>
 
-{% for restaurant in restaurant_results %}
-    {% if restaurant['photo_url'] %}
-        <img src="{{restaurant['photo_url']}}" alt="Photo of {{restaurant['name']}}"/>
-    {% endif %}
-    <p>Name: <a href="{{url_for('display_restaurant_page', restaurant_id=restaurant.id)}}" target="_blank">{{restaurant['name']}}</a> </p>
-    <p>Address: {{restaurant['address'] or "N/A"}}</p>
-    <p>Cuisine(s): {{restaurant['cuisines'] or "N/A"}}</p>
-    <p>About: {{restaurant['description'] or "N/A"}}</p>
-
-    <hr>
-{% endfor %}
+  {% endif %}
+</div>
 
 {% endblock %}
