@@ -150,5 +150,51 @@ class ProfileTestCase(TestCase):
       user_fred = User.query.filter(User.first_name == 'Fred').first()
       self.assertEqual(user_fred.id, user_ted_id)
 
-
   # Change password tests
+
+  def test_logged_out_update_password_page(self):
+    """When a logged out user tries to  access the change password page, are they redirected to the homepage?"""
+
+    with self.client as c:
+      resp = c.get("/users/profile/update_password")
+
+      self.assertEqual(resp.status_code, 302)
+      self.assertEqual(resp.location, "/")
+  
+  def test_logged_in_update_password_page(self):
+    """When a logged in user accesses the update change password page, do they see the appropriate form?"""
+
+    user_ted = User.query.filter(User.first_name == 'Ted').first()
+
+    with self.client as c:
+      # simulate user_ted logging in
+      with c.session_transaction() as sess:
+        sess[CURRENT_USER_KEY] = user_ted.id
+      
+      resp = c.get("/users/profile/update_password")
+      html = resp.get_data(as_text=True)
+
+      self.assertEqual(resp.status_code, 200)
+      self.assertIn('<h2 class="form-header display-2">Change Password Below.</h2>', html)
+      self.assertIn('<button class="btn btn-success">Change Password</button>', html)
+  
+  def test_change_password(self):
+    """When a logged in user changes their password successfully, is their password updated?"""
+
+    user_ted = User.query.filter(User.first_name == 'Ted').first()
+
+    with self.client as c:
+      # simulate user_ted logging in
+      with c.session_transaction() as sess:
+        sess[CURRENT_USER_KEY] = user_ted.id
+      
+      resp = c.post("/users/profile/update_password", data={"current_password": "PASSWORD1", "new_password": "CHANGED_PASSWORD"})
+
+      self.assertEqual(resp.status_code, 302)
+      self.assertEqual(resp.location, "/users/profile")
+
+      # Was the password updated?
+      self.assertFalse(User.confirm_password(user_ted.id, "PASSWORD1"))
+      self.assertTrue(User.confirm_password(user_ted.id, "CHANGED_PASSWORD"))
+
+
