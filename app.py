@@ -907,6 +907,14 @@ def create_app(db_name, testing=False):
         else:
             return render_template("home_anon.html")
     
+    @app.errorhandler(404)
+    def not_found(e):
+        """When the user tries to access a URL that can't be found, return a 404 error message and redirect the user to the homepage."""
+
+        flash("404 Not Found: The URL you requested was not found", "danger")
+
+        return redirect("/")
+    
     ##############################################################################
     # Turn off all caching in Flask
     #   (useful for dev; in production, this kind of stuff is typically
