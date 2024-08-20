@@ -19,7 +19,7 @@
         {% for review in reviews %}
         <div class="restaurant-review">
           <div class="review-byline">
-            <p class="font-weight-light">By {{review.author.get_full_name()}}, created at {{review.format_created_at()}}</p>
+            <p class="font-weight-light">Created at {{review.format_created_at()}}</p>
           </div>
           <img class="main-picture" src="{{review.restaurant.photo_url}}" alt="Photo of {{review.restaurant.name}}"/>
           <p>Review for <a href="{{url_for('display_restaurant_page', restaurant_id=review.restaurant.id)}}">{{review.restaurant.name}} - {{review.restaurant.address}}</a></p>

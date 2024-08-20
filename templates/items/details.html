@@ -37,7 +37,7 @@
       <div class="col-lg-8 col-md-10 col-12">
         {% for review in item_reviews %}
         <div class="item-review">
-          <div class="item-byline">
+          <div class="review-byline">
             <p class="font-weight-light">By {{review.author.get_full_name()}}, created at {{review.format_created_at()}}</p>
           </div>
           <h4 class="display-4">{{review.title}}</h4>

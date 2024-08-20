@@ -107,7 +107,7 @@ footer, .home-anon-container {
     margin-bottom: 10px;
 }
 
-.review-byline, .item-byline {
+.review-byline {
     display: flex;
     justify-content: flex-end;
 }

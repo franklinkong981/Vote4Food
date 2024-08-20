@@ -4,29 +4,37 @@
 
 {% block content %}
 
-<h1 class="display-1">{{g.user.get_full_name()}}'s Reviews for Menu Items ({{reviews.count()}})</h1>
+<div class="banner container-fluid">
+  <h1 class="display-1">{{g.user.get_full_name()}}'s Reviews for Menu Items ({{reviews.count()}})</h1>
+</div>
 <hr>
 
-{% if reviews.count() == 0 %}
-  <p>You have not currently written any reviews for menu items.</p>
-{% endif %}
+<div class="items-reviews container-fluid">
+  {% if reviews.count() == 0 %}
+    <p>You have not currently written any reviews for menu items.</p>
+  {% endif %}
 
-{% for review in reviews %}
-    <img src="{{review.item.image_url}}" alt="Photo of {{review.item.title}}"/>
-    <p>Review of <a href="{{url_for('display_item_page', item_id=review.item.id)}}">{{review.item.title}}</a> from {{review.item.restaurant_chain}}</p>
-
-    <h4 class="display-4">{{review.title}}</h4>
-    <p>{{review.content}}</p>
-    <p class="font-weight-light">Created at {{review.format_created_at()}}</p>
-
-    <form method="POST" action="{{url_for('delete_item_review', item_id=review.item.id, review_id=review.id)}}">
-        <a class="btn btn-light" href="{{url_for('update_item_review', item_id=review.item.id, review_id=review.id)}}">
-          Edit <i class="fa-solid fa-pencil"></i>
-        </a>
-        <button class="btn btn-danger">Delete</button>
-    </form>
-    
-    <hr>
-{% endfor %}
+    <div class="item-review-row row">
+      <div class="col-lg-8 col-md-10 col-12">
+        {% for review in reviews %}
+          <div class="item-review">
+            <div class="review-byline">
+              <p class="font-weight-light">Created at {{review.format_created_at()}}</p>
+            </div>
+            <img class="main-picture" src="{{review.item.image_url}}" alt="Photo of {{review.item.title}}"/>
+            <p>Review for <a href="{{url_for('display_item_page', item_id=review.item.id)}}">{{review.item.title}}</a> from {{review.item.restaurant_chain}}</a></p>
+            <h4 class="display-4">{{review.title}}</h4>
+            <p>{{review.content}}</p>
+            <form method="POST" action="{{url_for('delete_item_review', item_id=review.item.id, review_id=review.id)}}">
+              <a class="btn btn-light" href="{{url_for('update_item_review', item_id=review.item.id, review_id=review.id)}}">
+                Edit <i class="fa-solid fa-pencil"></i>
+              </a>
+              <button class="btn btn-danger">Delete</button>
+            </form>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+</div>
 
 {% endblock %}
