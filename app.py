@@ -180,7 +180,7 @@ def create_app(db_name, testing=False):
         number_favorites = len(list(g.user.favorite_restaurants))
         return render_template("/users/favorites/restaurants.html", favorites=g.user.favorite_restaurants, number_favorites=number_favorites)
     
-    @app.route('/users/favorite/items')
+    @app.route('/users/favorites/items')
     def show_favorited_items():
         """Shows a list of the currently logged in user's favorited menu items."""
 

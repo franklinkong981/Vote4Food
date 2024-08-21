@@ -279,6 +279,128 @@ class ProfileTestCase(TestCase):
 
   # Favorites button tests
 
+  def test_favorited_restaurant_page(self):
+    """When a logged in user visits the page of a restaurant they favorited, do they see the appropriate button?"""
+
+    user_ted = User.query.filter(User.first_name == "Ted").first()
+    mcdonalds = Restaurant.query.filter(Restaurant.name == "McDonalds").first()
+
+    with self.client as c:
+      # simulate user_ted logging in
+      with c.session_transaction() as sess:
+        sess[CURRENT_USER_KEY] = user_ted.id
+      
+      resp = c.get(f"/restaurants/{mcdonalds.id}")
+      html = resp.get_data(as_text=True)
+
+      self.assertEqual(resp.status_code, 200)
+      self.assertIn('Remove from Favorites <i class="fa-solid fa-star">', html)
+  
+  def test_unfavorited_restaurant_page(self):
+    """When a logged in user visits the page of a restaurant they haven't favorited, do they see the appropriate button?"""
+
+    user_ted = User.query.filter(User.first_name == "Ted").first()
+    arbys = Restaurant.query.filter(Restaurant.name == "Arbys").first()
+
+    with self.client as c:
+      # simulate user_ted logging in
+      with c.session_transaction() as sess:
+        sess[CURRENT_USER_KEY] = user_ted.id
+      
+      resp = c.get(f"/restaurants/{arbys.id}")
+      html = resp.get_data(as_text=True)
+
+      self.assertEqual(resp.status_code, 200)
+      self.assertIn('Add to Favorites <i class="fa-regular fa-star"></i>', html)
+
+  def test_favorited_item_page(self):
+    """When a logged in user visits the page of a menu item they favorited, do they see the appropriate button?"""
+
+    user_ted = User.query.filter(User.first_name == "Ted").first()
+    big_mac = Item.query.filter(Item.title == "Big Mac").first()
+
+    with self.client as c:
+      # simulate user_ted logging in
+      with c.session_transaction() as sess:
+        sess[CURRENT_USER_KEY] = user_ted.id
+      
+      resp = c.get(f"/items/{big_mac.id}")
+      html = resp.get_data(as_text=True)
+
+      self.assertEqual(resp.status_code, 200)
+      self.assertIn('Remove from Favorites <i class="fa-solid fa-star">', html)
+  
+  def test_unfavorited_item_page(self):
+    """When a logged in user visits the page of a menu item they haven't favorited, do they see the appropriate button?"""
+
+    user_ted = User.query.filter(User.first_name == "Ted").first()
+    roast_beef_sandwich = Item.query.filter(Item.title == "Roast Beef Sandwich").first()
+
+    with self.client as c:
+      # simulate user_ted logging in
+      with c.session_transaction() as sess:
+        sess[CURRENT_USER_KEY] = user_ted.id
+      
+      resp = c.get(f"/items/{roast_beef_sandwich.id}")
+      html = resp.get_data(as_text=True)
+
+      self.assertEqual(resp.status_code, 200)
+      self.assertIn('Add to Favorites <i class="fa-regular fa-star"></i>', html)
+
   # Viewing favorite restaurants tests
 
+  def test_logged_out_favorite_restaurants_page(self):
+    """When a logged out user tries to access a list of their favorite restaurants, are they redirected to the home page?"""
+
+    with self.client as c:
+      resp = c.get(f"/users/favorites/restaurants")
+
+      self.assertEqual(resp.status_code, 302)
+      self.assertEqual(resp.location, "/")
+  
+  def test_favorite_restaurants_page(self):
+    """When a logged in user accesses the list of their favorite restaurants, do they see the appropriate restaurants listed?"""
+
+    user_ted = User.query.filter(User.first_name == "Ted").first()
+
+    with self.client as c:
+      # simulate user_ted logging in
+      with c.session_transaction() as sess:
+        sess[CURRENT_USER_KEY] = user_ted.id
+      
+      resp = c.get(f"/users/favorites/restaurants")
+      html = resp.get_data(as_text=True)
+
+      self.assertEqual(resp.status_code, 200)
+      self.assertIn('Favorite Restaurants (1)', html)
+      self.assertIn('McDonalds', html)
+      self.assertNotIn('Arbys', html)
+
   # Viewing favorite menu items tests
+
+  def test_logged_out_favorite_restaurants_page(self):
+    """When a logged out user tries to access a list of their favorite menu items, are they redirected to the home page?"""
+
+    with self.client as c:
+      resp = c.get(f"/users/favorites/items")
+
+      self.assertEqual(resp.status_code, 302)
+      self.assertEqual(resp.location, "/")
+  
+  def test_favorite_items_page(self):
+    """When a logged in user accesses the list of their favorite menu items, do they see the appropriate menu items listed?"""
+
+    user_ted = User.query.filter(User.first_name == "Ted").first()
+
+    with self.client as c:
+      # simulate user_ted logging in
+      with c.session_transaction() as sess:
+        sess[CURRENT_USER_KEY] = user_ted.id
+      
+      resp = c.get(f"/users/favorites/items")
+      html = resp.get_data(as_text=True)
+
+      self.assertEqual(resp.status_code, 200)
+      self.assertIn('Favorite Menu Items (1)', html)
+      self.assertIn('Big Mac', html)
+      self.assertNotIn('Roast Beef Sandwich', html)
