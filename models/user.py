@@ -35,7 +35,7 @@ class User(db.Model):
         return self.created_at.strftime("%A, %m/%d/%Y at %I:%M%p")
 
     @classmethod
-    def create_user(cls, first_name, last_name, email, user_image_url, password):
+    def create_user(cls, first_name, last_name, email, user_image_url, password, id= None):
         """Creates and returns a new user model instance out of the input parameters and hashes the password using bcrypt."""
 
         hashed_password = bcrypt.generate_password_hash(password).decode('UTF-8')

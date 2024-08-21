@@ -87,8 +87,8 @@ class Restaurant_Review(db.Model):
     __tablename__ = "restaurant_reviews"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    author_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    restaurant_id = db.Column(db.Text, db.ForeignKey('restaurants.id'), nullable=False)
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='cascade'), nullable=False)
+    restaurant_id = db.Column(db.Text, db.ForeignKey('restaurants.id', ondelete='cascade'), nullable=False)
     title = db.Column(db.String(100), nullable=False)
     content = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
@@ -103,6 +103,6 @@ class Restaurant_Favorite(db.Model):
 
     __tablename__ = "restaurant_favorites"
 
-    author_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
-    restaurant_id = db.Column(db.Text, db.ForeignKey('restaurants.id'), primary_key=True)
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='cascade'), primary_key=True)
+    restaurant_id = db.Column(db.Text, db.ForeignKey('restaurants.id', ondelete='cascade'), primary_key=True)
     created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))

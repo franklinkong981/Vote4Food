@@ -47,8 +47,8 @@ class Item_Review(db.Model):
     __tablename__ = "item_reviews"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    author_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    item_id = db.Column(db.Integer, db.ForeignKey('items.id'), nullable=False)
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='cascade'), nullable=False)
+    item_id = db.Column(db.Integer, db.ForeignKey('items.id', ondelete='cascade'), nullable=False)
     title = db.Column(db.String(100), nullable=False)
     content = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
@@ -63,6 +63,6 @@ class Item_Favorite(db.Model):
 
     __tablename__ = "item_favorites"
 
-    author_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
-    item_id = db.Column(db.Integer, db.ForeignKey('items.id'), primary_key=True)
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='cascade'), primary_key=True)
+    item_id = db.Column(db.Integer, db.ForeignKey('items.id', ondelete='cascade'), primary_key=True)
     created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
