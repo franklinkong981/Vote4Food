@@ -58,7 +58,7 @@ class ProfileTestCase(TestCase):
     # Create sample restaurant
     arbys = Restaurant(
       id = "restaurant1",
-      name = "Arby's",
+      name = "Arbys",
       address = "California",
       cuisines = "Sandwiches, fast food, burgers",
       description = "Good fast food place that sells burgers and sandwiches",
@@ -70,7 +70,7 @@ class ProfileTestCase(TestCase):
 
     mcdonalds = Restaurant(
       id = "restaurant2",
-      name = "McDonald's",
+      name = "McDonalds",
       address = "San Diego, California, 92129",
       cuisines = "Fast food, burgers, ice cream",
       description = "Famous fast food place that sells burgers, fries, and has a value menu.",
@@ -92,7 +92,7 @@ class ProfileTestCase(TestCase):
 
     big_mac = Item(
       title = "Big Mac",
-      restaurant_chain = "McDonald's",
+      restaurant_chain = "McDonalds",
       image_url = "www.mcdonalds.com/big_mac_image.jpg"
     )
     db.session.add(big_mac)
@@ -111,7 +111,7 @@ class ProfileTestCase(TestCase):
   def test_logged_out_restaurant_details_page(self):
     """When a logged out user tries to access a restaurant details page, are they redirected back to the homepage?"""
 
-    arbys = Restaurant.query.filter(Restaurant.name == "Arby's").first()
+    arbys = Restaurant.query.filter(Restaurant.name == "Arbys").first()
 
     with self.client as c:
       resp = c.get(f"/restaurants/{arbys.id}")
@@ -122,7 +122,7 @@ class ProfileTestCase(TestCase):
   def test_restaurant_details(self):
     """When a logged in user accesses a restaurant's details page, do they see the appropriate information?"""
 
-    arbys = Restaurant.query.filter(Restaurant.name == "Arby's").first()
+    arbys = Restaurant.query.filter(Restaurant.name == "Arbys").first()
     user_ted = User.query.filter(User.first_name == 'Ted').first()
 
     with self.client as c:
@@ -145,7 +145,7 @@ class ProfileTestCase(TestCase):
   def test_restaurant_details_with_hours(self):
     """When a logged in user accesses a restaurant's with hours details page, are the hours listed?"""
 
-    mcdonalds = Restaurant.query.filter(Restaurant.name == "McDonald's").first()
+    mcdonalds = Restaurant.query.filter(Restaurant.name == "McDonalds").first()
     user_ted = User.query.filter(User.first_name == 'Ted').first()
 
     with self.client as c:
@@ -161,10 +161,8 @@ class ProfileTestCase(TestCase):
       self.assertIn('<th scope="col">7:00AM-5:00PM</th>', html)
     
   def test_invalid_restaurant_details(self):
-    """When a logged in user accesses an invalid restaurant id's details page, are they given a 404 error and redirected back to the homepage?"""
+    """When a logged in user accesses an invalid restaurant id's details page, are they redirected back to the homepage?"""
 
-    arbys = Restaurant.query.filter(Restaurant.name == "Arby's").first()
-    mcdonalds = Restaurant.query.filter(Restaurant.name == "McDonald's").first()
     user_ted = User.query.filter(User.first_name == 'Ted').first()
 
     with self.client as c:
@@ -178,3 +176,56 @@ class ProfileTestCase(TestCase):
         self.assertEqual(resp.location, "/")
 
   # Tests on menu item details page
+
+  def test_logged_out_restaurant_details_page(self):
+    """When a logged out user tries to access a menu item details page, are they redirected back to the homepage?"""
+
+    big_mac = Item.query.filter(Item.title == "Big Mac").first()
+
+    with self.client as c:
+      resp = c.get(f"/items/{big_mac.id}")
+
+      self.assertEqual(resp.status_code, 302)
+      self.assertEqual(resp.location, "/")
+  
+  def test_item_details(self):
+    """When a logged in user accesses a menu item's details page, do they see the appropriate information?"""
+
+    big_mac = Item.query.filter(Item.title == "Big Mac").first()
+    user_ted = User.query.filter(User.first_name == 'Ted').first()
+
+    with self.client as c:
+      # simulate user_ted logging in
+      with c.session_transaction() as sess:
+        sess[CURRENT_USER_KEY] = user_ted.id
+      
+      resp = c.get(f"/items/{big_mac.id}")
+      html = resp.get_data(as_text=True)
+
+      self.assertEqual(resp.status_code, 200)
+      self.assertIn('<h1 class="display-1">Big Mac</h1><br>', html)
+      self.assertIn('<h3 class="display-3">From McDonalds</h3>', html)
+      self.assertIn('Add to Favorites <i class="fa-regular fa-star"></i>', html)
+
+      # Appropriately says there are no reviews for this restaurant.
+      self.assertIn(' <p>There are no reviews currently for this menu item.', html)
+  
+  def test_invalid_item_details(self):
+    """When a logged in user accesses an invalid item id's details page, are they redirected back to the homepage?"""
+
+    user_ted = User.query.filter(User.first_name == 'Ted').first()
+    big_mac = Item.query.filter(Item.title == "Big Mac").first()
+
+    invalid_id = 1
+    if invalid_id == big_mac.id:
+      invalid_id += 1
+
+    with self.client as c:
+      # simulate user_ted logging in
+      with c.session_transaction() as sess:
+        sess[CURRENT_USER_KEY] = user_ted.id
+
+        resp = c.get(f"/items/{invalid_id}")
+
+        self.assertEqual(resp.status_code, 302)
+        self.assertEqual(resp.location, "/")
