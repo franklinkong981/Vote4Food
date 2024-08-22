@@ -136,6 +136,8 @@ class ProfileTestCase(TestCase):
   """There are two users: Ted and Tara. There is one restaurant, McDonalds, and one item from McDonalds: The Big Mac. Ted and Tara both
   have one review each of McDonalds and the Big Mac."""
 
+  # Tests for viewing reviews on details pages
+
   def test_view_restaurant_reviews(self):
     """When a logged in user accesses a restaurant's details page, do they see all the reviews for the restaurant?"""
 
@@ -177,3 +179,107 @@ class ProfileTestCase(TestCase):
       self.assertIn("<p>Its juicy and delicious, and I really like the secret sauce!</p>", html)
       self.assertIn('<h4 class="display-4">I Did Not Like It</h4>', html)
       self.assertIn("<p>It was bland and had no taste. The lettuce got everywhere and the bun was soggy.</p>", html)
+  
+  # Tests for adding reviews
+
+  def test_logged_out_add_restaurant_review(self):
+    """When a logged out user tries to access the add restaurant review form, are they redirected to the homepage?"""
+
+    mcdonalds = Restaurant.query.filter(Restaurant.name == "McDonalds").first()
+
+    with self.client as c:
+      resp = c.get(f"/restaurants/{mcdonalds.id}/reviews/create")
+
+      self.assertEqual(resp.status_code, 302)
+      self.assertEqual(resp.location, "/")
+  
+  def test_add_restaurant_review_form(self):
+    """When a logged in user accesses the add restaurant review form, do they see the appropriate form?"""
+
+    user_ted = User.query.filter(User.first_name == "Ted").first()
+    mcdonalds = Restaurant.query.filter(Restaurant.name == "McDonalds").first()
+
+    with self.client as c:
+      # simulate user_ted logging in
+      with c.session_transaction() as sess:
+        sess[CURRENT_USER_KEY] = user_ted.id
+      
+      resp = c.get(f"/restaurants/{mcdonalds.id}/reviews/create")
+      html = resp.get_data(as_text=True)
+
+      self.assertEqual(resp.status_code, 200)
+      self.assertIn('<h2 class="form-header display-2">Create a New Review for McDonalds.</h2>', html)
+      self.assertIn('<button class="btn btn-success">Create Review</button>', html)
+  
+  def test_add_restaurant_review(self):
+    """When a logged in user adds a new restaurant review, is this review added to the database?"""
+
+    user_ted = User.query.filter(User.first_name == "Ted").first()
+    mcdonalds = Restaurant.query.filter(Restaurant.name == "McDonalds").first()
+
+    self.assertEqual(len(user_ted.restaurant_reviews), 1)
+
+    with self.client as c:
+      # simulate user_ted logging in
+      with c.session_transaction() as sess:
+        sess[CURRENT_USER_KEY] = user_ted.id
+      
+      resp = c.post(f"/restaurants/{mcdonalds.id}/reviews/create", data={"title": "My 2nd Review of McDonalds", "content": "I visited this place again and it was as great as ever!"})
+
+      self.assertEqual(resp.status_code, 302)
+      self.assertEqual(resp.location, f"/restaurants/{mcdonalds.id}")
+      self.assertEqual(len(user_ted.restaurant_reviews), 2)
+
+  def test_logged_out_add_item_review(self):
+    """When a logged out user tries to access te add menu item review form, are they redirected to the homepage?"""
+
+    big_mac = Item.query.filter(Item.title == "Big Mac").first()
+
+    with self.client as c:
+      resp = c.get(f"/items/{big_mac.id}/reviews/create")
+
+      self.assertEqual(resp.status_code, 302)
+      self.assertEqual(resp.location, "/")
+
+  def test_add_item_review_form(self):
+    """When a logged in user accesses the add menu item review form, do they see the appropriate form?"""
+
+    user_ted = User.query.filter(User.first_name == "Ted").first()
+    big_mac = Item.query.filter(Item.title == "Big Mac").first()
+
+    with self.client as c:
+      # simulate user_ted logging in
+      with c.session_transaction() as sess:
+        sess[CURRENT_USER_KEY] = user_ted.id
+      
+      resp = c.get(f"/items/{big_mac.id}/reviews/create")
+      html = resp.get_data(as_text=True)
+
+      self.assertEqual(resp.status_code, 200)
+      self.assertIn('Create a New Review for Big Mac from McDonalds.', html)
+      self.assertIn('<button class="btn btn-success">Create Review</button>', html)
+
+  def test_add_item_review(self):
+    """When a logged in user adds a new menu item review, is this review added to the database?"""
+
+    user_ted = User.query.filter(User.first_name == "Ted").first()
+    big_mac = Item.query.filter(Item.title == "Big Mac").first()
+
+    self.assertEqual(len(user_ted.item_reviews), 1)
+
+    with self.client as c:
+      # simulate user_ted logging in
+      with c.session_transaction() as sess:
+        sess[CURRENT_USER_KEY] = user_ted.id
+      
+      resp = c.post(f"/items/{big_mac.id}/reviews/create", data={"title": "My 2nd Review of the Big Mac", "content": "I had it again and now I love it even more!"})
+
+      self.assertEqual(resp.status_code, 302)
+      self.assertEqual(resp.location, f"/items/{big_mac.id}")
+      self.assertEqual(len(user_ted.item_reviews), 2)
+   
+  # Tests for ediitng reviews
+
+  # Tests for deleting reviews
+
+  # Tests for viewing list of user's own reviews
