@@ -280,6 +280,148 @@ class ProfileTestCase(TestCase):
    
   # Tests for ediitng reviews
 
+  def test_logged_out_edit_restaurant_review_form(self):
+    """When a logged out user tries to access the edit restaurant review form, are they redirected to the homepage?"""
+
+    mcdonalds = Restaurant.query.filter(Restaurant.name == "McDonalds").first()
+    ted_mcdonalds_review = Restaurant_Review.query.filter(Restaurant_Review.title == "My Favorite Restaurant!").first()
+
+    with self.client as c:
+      resp = c.get(f"/restaurants/{mcdonalds.id}/reviews/{ted_mcdonalds_review.id}/update")
+
+      self.assertEqual(resp.status_code, 302)
+      self.assertEqual(resp.location, "/")
+  
+  def test_edit__restaurant_review_form(self):
+    """When a logged in user accesses the edit restaurant review form for one of their own restaurant reviews, do they see the appropriate form?"""
+
+    user_ted = User.query.filter(User.first_name == "Ted").first()
+    mcdonalds = Restaurant.query.filter(Restaurant.name == "McDonalds").first()
+    ted_mcdonalds_review = Restaurant_Review.query.filter(Restaurant_Review.title == "My Favorite Restaurant!").first()
+
+    with self.client as c:
+      # simulate user_ted logging in
+      with c.session_transaction() as sess:
+        sess[CURRENT_USER_KEY] = user_ted.id
+      
+      resp = c.get(f"/restaurants/{mcdonalds.id}/reviews/{ted_mcdonalds_review.id}/update")
+      html = resp.get_data(as_text=True)
+
+      self.assertEqual(resp.status_code, 200)
+      self.assertIn('Edit Your Review for McDonalds.', html)
+      self.assertIn('<button class="btn btn-success">Edit Review</button>', html)
+
+  def test_edit_unauthorized_restaurant_review_form(self):
+    """When a logged in user tries to access the edit restaurant review form for a restaurant review they didn't write, are they redirected to the homepage?"""
+
+    user_ted = User.query.filter(User.first_name == "Ted").first()
+    mcdonalds = Restaurant.query.filter(Restaurant.name == "McDonalds").first()
+    tara_mcdonalds_review = Restaurant_Review.query.filter(Restaurant_Review.title == "Meh").first()
+
+    with self.client as c:
+      # simulate user_ted logging in
+      with c.session_transaction() as sess:
+        sess[CURRENT_USER_KEY] = user_ted.id
+      
+      resp = c.get(f"/restaurants/{mcdonalds.id}/reviews/{tara_mcdonalds_review.id}/update")
+
+      self.assertEqual(resp.status_code, 302)
+      self.assertEqual(resp.location, "/")
+
+  def test_edit_restaurant_review(self):
+    """When a logged in user successfully updates a restaurant review created by them, is the review sucessfully updated in the database?"""
+
+    user_ted = User.query.filter(User.first_name == "Ted").first()
+    mcdonalds = Restaurant.query.filter(Restaurant.name == "McDonalds").first()
+    ted_mcdonalds_review = Restaurant_Review.query.filter(Restaurant_Review.title == "My Favorite Restaurant!").first()
+
+    self.assertEqual(len(user_ted.restaurant_reviews), 1)
+    self.assertEqual(ted_mcdonalds_review.title, "My Favorite Restaurant!")
+
+    with self.client as c:
+      # simulate user_ted logging in
+      with c.session_transaction() as sess:
+        sess[CURRENT_USER_KEY] = user_ted.id
+      
+      resp = c.post(f"/restaurants/{mcdonalds.id}/reviews/{ted_mcdonalds_review.id}/update", data={"title": "Still My Favorite Restaurant!", "content": "It's so good!"})
+
+      self.assertEqual(resp.status_code, 302)
+      self.assertEqual(resp.location, f"/restaurants/{mcdonalds.id}")
+      self.assertEqual(len(user_ted.restaurant_reviews), 1)
+      self.assertEqual(ted_mcdonalds_review.title, "Still My Favorite Restaurant!")
+      self.assertEqual(ted_mcdonalds_review.content, "It's so good!")
+  
+  def test_logged_out_edit_item_review_form(self):
+    """When a logged out user tries to taccess the edit menu item review form, are they redirected to the homepage?"""
+
+    big_mac = Item.query.filter(Item.title == "Big Mac").first()
+    ted_big_mac_review = Item_Review.query.filter(Item_Review.title == "One of my Favorite Foods!").first()
+
+    with self.client as c:
+      resp = c.get(f"/items/{big_mac.id}/reviews/{ted_big_mac_review.id}/update")
+
+      self.assertEqual(resp.status_code, 302)
+      self.assertEqual(resp.location, "/")
+  
+  def test_edit__item_review_form(self):
+    """When a logged in user accesses the edit menu item review form for one of their own menu item reviews, do they see the appropriate form?"""
+
+    user_ted = User.query.filter(User.first_name == "Ted").first()
+    big_mac = Item.query.filter(Item.title == "Big Mac").first()
+    ted_big_mac_review = Item_Review.query.filter(Item_Review.title == "One of my Favorite Foods!").first()
+
+    with self.client as c:
+      # simulate user_ted logging in
+      with c.session_transaction() as sess:
+        sess[CURRENT_USER_KEY] = user_ted.id
+      
+      resp = c.get(f"/items/{big_mac.id}/reviews/{ted_big_mac_review.id}/update")
+      html = resp.get_data(as_text=True)
+
+      self.assertEqual(resp.status_code, 200)
+      self.assertIn('<h2 class="form-header display-2">Edit Your Review for Big Mac.</h2>', html)
+      self.assertIn('<button class="btn btn-success">Edit Review</button>', html)
+
+  def test_edit_unauthorized_restaurant_review_form(self):
+    """When a logged in user tries to access the edit restaurant review form for a restaurant review they didn't write, are they redirected to the homepage?"""
+
+    user_ted = User.query.filter(User.first_name == "Ted").first()
+    big_mac = Item.query.filter(Item.title == "Big Mac").first()
+    tara_big_mac_review = Item_Review.query.filter(Item_Review.title == "I Did Not Like It").first()
+
+    with self.client as c:
+      # simulate user_ted logging in
+      with c.session_transaction() as sess:
+        sess[CURRENT_USER_KEY] = user_ted.id
+      
+      resp = c.get(f"/items/{big_mac.id}/reviews/{tara_big_mac_review.id}/update")
+
+      self.assertEqual(resp.status_code, 302)
+      self.assertEqual(resp.location, "/")
+
+  def test_edit_item_review(self):
+    """When a logged in user successfully updates a menu item review created by them, is the review sucessfully updated in the database?"""
+
+    user_ted = User.query.filter(User.first_name == "Ted").first()
+    big_mac = Item.query.filter(Item.title == "Big Mac").first()
+    ted_big_mac_review = Item_Review.query.filter(Item_Review.title == "One of my Favorite Foods!").first()
+
+    self.assertEqual(len(user_ted.item_reviews), 1)
+    self.assertEqual(ted_big_mac_review.title, "One of my Favorite Foods!")
+
+    with self.client as c:
+      # simulate user_ted logging in
+      with c.session_transaction() as sess:
+        sess[CURRENT_USER_KEY] = user_ted.id
+      
+      resp = c.post(f"/items/{big_mac.id}/reviews/{ted_big_mac_review.id}/update", data={"title": "I Love It!", "content": "It's so good!"})
+
+      self.assertEqual(resp.status_code, 302)
+      self.assertEqual(resp.location, f"/items/{big_mac.id}")
+      self.assertEqual(len(user_ted.item_reviews), 1)
+      self.assertEqual(ted_big_mac_review.title, "I Love It!")
+      self.assertEqual(ted_big_mac_review.content, "It's so good!") 
+
   # Tests for deleting reviews
 
   # Tests for viewing list of user's own reviews
