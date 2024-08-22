@@ -363,7 +363,7 @@ class ProfileTestCase(TestCase):
       self.assertEqual(resp.status_code, 302)
       self.assertEqual(resp.location, "/")
   
-  def test_edit__item_review_form(self):
+  def test_edit_item_review_form(self):
     """When a logged in user accesses the edit menu item review form for one of their own menu item reviews, do they see the appropriate form?"""
 
     user_ted = User.query.filter(User.first_name == "Ted").first()
@@ -382,8 +382,8 @@ class ProfileTestCase(TestCase):
       self.assertIn('<h2 class="form-header display-2">Edit Your Review for Big Mac.</h2>', html)
       self.assertIn('<button class="btn btn-success">Edit Review</button>', html)
 
-  def test_edit_unauthorized_restaurant_review_form(self):
-    """When a logged in user tries to access the edit restaurant review form for a restaurant review they didn't write, are they redirected to the homepage?"""
+  def test_edit_unauthorized_itemt_review_form(self):
+    """When a logged in user tries to access the edit menu item review form for a restaurant review they didn't write, are they redirected to the homepage?"""
 
     user_ted = User.query.filter(User.first_name == "Ted").first()
     big_mac = Item.query.filter(Item.title == "Big Mac").first()
@@ -423,5 +423,113 @@ class ProfileTestCase(TestCase):
       self.assertEqual(ted_big_mac_review.content, "It's so good!") 
 
   # Tests for deleting reviews
+
+  def logged_out_delete_restaurant_review(self):
+    """When a logged out user tries to delete a review for a restaurant, are they redirected to the home page?"""
+
+    user_ted = User.query.filter(User.first_name == "Ted").first()
+    mcdonalds = Restaurant.query.filter(Restaurant.name == "McDonalds").first()
+    ted_mcdonalds_review = Restaurant_Review.query.filter(Restaurant_Review.title == "My Favorite Restaurant!").first()
+
+    with self.client as c:
+      resp = c.post("/restaurants/{mcdonalds.id}/reviews/{ted_mcdonalds_review.id}/delete")
+
+      self.assertEqual(resp.status_code, 302)
+      self.assertEqual(resp.location, "/")
+  
+  def delete_unauthorized_restaurant_review(self):
+    """When a logged in user tries to delete a review for a restaurant that isn't theirs, are they redirected to the homepage?"""
+
+    user_ted = User.query.filter(User.first_name == "Ted").first()
+    user_tara = User.query.filter(User.first_name == "Tara")
+    mcdonalds = Restaurant.query.filter(Restaurant.name == "McDonalds").first()
+    tara_mcdonalds_review = Restaurant_Review.query.filter(Restaurant_Review.title == "Meh").first()
+
+    self.assertEqual(len(user_tara.restaurant_reviews), 1)
+
+    with self.client as c:
+      # simulate user_ted logging in
+      with c.session_transaction() as sess:
+        sess[CURRENT_USER_KEY] = user_ted.id
+      
+      resp = c.post("/restaurants/{mcdonalds.id}/reviews/{tara_mcdonalds_review.id}/delete")
+
+      self.assertEqual(resp.status_code, 302)
+      self.assertEqual(resp.location, "/")
+      self.assertEqual(len(user_tara.restaurant_reviews), 1)
+  
+  def delete_restaurant_review(self):
+    """When a logged in user delets a review for a restaurant that they created, is the review successfully deleted in the database?"""
+
+    user_ted = User.query.filter(User.first_name == "Ted").first()
+    mcdonalds = Restaurant.query.filter(Restaurant.name == "McDonalds").first()
+    ted_mcdonalds_review = Restaurant_Review.query.filter(Restaurant_Review.title == "My Favorite Restaurant!").first()
+
+    self.assertEqual(len(user_ted.restaurant_reviews), 1)
+
+    with self.client as c:
+      # simulate user_ted logging in
+      with c.session_transaction() as sess:
+        sess[CURRENT_USER_KEY] = user_ted.id
+      
+      resp = c.post("/restaurants/{mcdonalds.id}/reviews/{ted_mcdonalds_review.id}/delete")
+
+      self.assertEqual(resp.status_code, 302)
+      self.assertEqual(resp.location, "/")
+      self.assertEqual(len(user_ted.restaurant_reviews), 0)
+
+  def logged_out_delete_item_review(self):
+    """When a logged out user tries to delete a review for a menu item, are they redirected to the home page?"""
+
+    user_ted = User.query.filter(User.first_name == "Ted").first()
+    big_mac = Item.query.filter(Item.title == "Big Mac").first()
+    ted_big_mac_review = Item_Review.query.filter(Item_Review.title == "One of my Favorite Foods!").first()
+
+    with self.client as c:
+      resp = c.post("/items/{big_mac.id}/reviews/{ted_big_mac_review.id}/delete")
+
+      self.assertEqual(resp.status_code, 302)
+      self.assertEqual(resp.location, "/")
+  
+  def delete_unauthorized_item_review(self):
+    """When a logged in user tries to delete a review for a menu item that isn't theirs, are they redirected to the homepage?"""
+
+    user_ted = User.query.filter(User.first_name == "Ted").first()
+    user_tara = User.query.filter(User.first_name == "Tara")
+    big_mac = Item.query.filter(Item.title == "Big Mac").first()
+    tara_big_mac_review = Item_Review.query.filter(Item_Review.title == "I Did Not Like It").first()
+
+    self.assertEqual(len(user_tara.item_reviews), 1)
+
+    with self.client as c:
+      # simulate user_ted logging in
+      with c.session_transaction() as sess:
+        sess[CURRENT_USER_KEY] = user_ted.id
+      
+      resp = c.post("/items/{big_mac.id}/reviews/{tara_big_mac_review.id}/delete")
+
+      self.assertEqual(resp.status_code, 302)
+      self.assertEqual(resp.location, "/")
+      self.assertEqual(len(user_tara.item_reviews), 1)
+
+  def delete_item_review(self):
+    """When a logged in user delets a review for a menu item that they created, is the review successfully deleted in the database?"""
+
+    user_ted = User.query.filter(User.first_name == "Ted").first()
+    big_mac = Item.query.filter(Item.title == "Big Mac").first()
+    ted_big_mac_review = Item_Review.query.filter(Item_Review.title == "One of my Favorite Foods!").first()
+
+    self.assertEqual(len(user_ted.item_reviews), 1)
+
+    with self.client as c:
+      # simulate user_ted logging in
+      with c.session_transaction() as sess:
+        sess[CURRENT_USER_KEY] = user_ted.id
+      
+      resp = c.post("/restaurants/{big_mac.id}/reviews/{ted_big_mac_review.id}/delete")
+
+      self.assertEqual(resp.status_code, 302)
+      self.assertEqual(resp.location, "/")
+      self.assertEqual(len(user_ted.item_reviews), 0)
 
   # Tests for viewing list of user's own reviews
