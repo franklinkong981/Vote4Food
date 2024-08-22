@@ -1,6 +1,7 @@
-# Project Ideas
+# Initial Project Ideas
 
-In this file (but not restricted to), you can use to get used to working on this repository and jot down project ideas to easily be shared with your mentor!
+These are projects that I initially thought of doing but were scrapped in favor of the Vouch4Food app after I couldn't find a good API
+to implement them.
 
 1. Lyrics Search App - Users can create their own account, log in, and search up details (like name, artist, album, release date, etc.) of a song they like by typing in a part of the lyrics (ie. They just heard a song on the radio they like but can only make out the chorus). Users can thenview their lyric search history and can bookmark songs they find. Uses the lyrics.com Lyrics API.
 
