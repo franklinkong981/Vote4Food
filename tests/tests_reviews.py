@@ -533,3 +533,61 @@ class ProfileTestCase(TestCase):
       self.assertEqual(len(user_ted.item_reviews), 0)
 
   # Tests for viewing list of user's own reviews
+
+  def logged_out_restaurant_reviews_list(self):
+    """When a logged out user tries to view their list of restaurant reviews, are they redirected back to the homepage?"""
+
+    with self.client as c:
+      resp = c.get("/users/reviews/restaurants")
+
+      self.assertEqual(resp.status_code, 302)
+      self.assertEqual(resp.location, "/")
+  
+  def restaurant_reviews_list(self):
+    """When a logged in user views their list of restaurant reviews, do they see only the reviews they made?"""
+
+    user_ted = User.query.filter(User.first_name == "Ted").first()
+    
+    with self.client as c:
+      # simulate user_ted logging in
+      with c.session_transaction() as sess:
+        sess[CURRENT_USER_KEY] = user_ted.id
+      
+      resp = c.get("/users/reviews/restaurants")
+      html = resp.get_data(as_text=True)
+
+      self.assertEqual(resp.status_code, 200)
+      self.assertIn('Reviews for Restaurants (1)', html)
+      self.assertIn('<h4 class="display-4">My Favorite Restaurant!</h4>')
+      self.assertIn('<p>I really like this place, especially the Big Macs!</p>', html)
+      self.assertNotIn('<h4 class="display-4">Meh</h4>')
+      self.assertNotIn('<p>They have some good items like the Filet o Fish but not a fan of the Big Mac.</p>', html)
+
+  def logged_out_item_reviews_list(self):
+    """When a logged out user tries to view their list of menu item reviews, are they redirected back to the homepage?"""
+
+    with self.client as c:
+      resp = c.get("/users/reviews/items")
+
+      self.assertEqual(resp.status_code, 302)
+      self.assertEqual(resp.location, "/")
+  
+  def item_reviews_list(self):
+    """When a logged in user views their list of menu item reviews, do they see only the reviews they made?"""
+
+    user_ted = User.query.filter(User.first_name == "Ted").first()
+    
+    with self.client as c:
+      # simulate user_ted logging in
+      with c.session_transaction() as sess:
+        sess[CURRENT_USER_KEY] = user_ted.id
+      
+      resp = c.get("/users/reviews/items")
+      html = resp.get_data(as_text=True)
+
+      self.assertEqual(resp.status_code, 200)
+      self.assertIn('Reviews for Menu Items (1)', html)
+      self.assertIn('<h4 class="display-4">One of my Favorite Foods!</h4>')
+      self.assertIn('<p>Its juicy and delicious, and I really like the secret sauce!</p>', html)
+      self.assertNotIn('<h4 class="display-4">I Did Not Like It</h4>')
+      self.assertNotIn('<p>It was bland and had no taste. The lettuce got everywhere and the bun was soggy.</p>', html)
