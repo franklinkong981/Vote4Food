@@ -936,7 +936,9 @@ def create_app(db_name, testing=False):
     
     return app
 
+"""
 app = create_app('vouch4food')
 if __name__ == '__main__':
     connect_db(app)
     app.run(debug=True)
+"""
