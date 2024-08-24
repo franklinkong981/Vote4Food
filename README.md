@@ -1,4 +1,4 @@
-# [Vouch4Food] (https://vouch4food.onrender.com) - A Guide
+# [Vouch4Food](https://vouch4food.onrender.com) - A Guide
 
 ## Overview
 
@@ -20,4 +20,4 @@ Spoonacular (for restaurant and menu item lookup): https://spoonacular.com/food-
 
 Positionstack (for geocoding, address to longitude/latitude conversion): https://positionstack.com/ 
 
-[Visit Vouch4Food here] (https://vouch4food.onrender.com)
+[Visit Vouch4Food here](https://vouch4food.onrender.com)
