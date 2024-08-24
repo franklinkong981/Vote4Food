@@ -14,7 +14,7 @@ from the navigational bar on the top of every page) and the ability for users to
 
 Upon first visiting the website, users will be directed to the homepage.
 
-![Logged Out Home Page](logged_out_home.png)
+![Logged Out Home Page](/static/images/logged_out_home.png)
 
 From here, they can click on "Get Started" to create an account. They will be prompted to enter a first name (required), last name(required), email address (required, must be a valid email, and can't be an email associated with an account that's already been created), the URL to their profile picture (optional, if kept blank the default Vouch4Food Burger photo will be their profile picture), and a password that must be at least 8 characters long.
 
@@ -22,29 +22,29 @@ If the account creation is successful, they will then be redirected to the Log I
 
 Once login is successful, they will be taken to the logged in homepage.
 
-![Logged In Home Page](logged_in_home.png)
+![Logged In Home Page](/static/images/logged_in_home.png)
 
 On the homepage, you'll see there are buttons to access your favorite restaurants/menu items as well as reviews you've written for restaurants/menu items. 
 
 Below that, you'll see the button to set your current location, which takes you to a form where you can set the zip code you live in (must be a valid 5-digit US postal code). Once you've set your location, the approximate coordinates for the zip code you've set will be calculated and a list of nearby restaurants will then be displayed on your home page.
 
-![Restaurants Near You Home Page Listings](restaurants_near_you.png)
+![Restaurants Near You Home Page Listings](/static/images/restaurants_near_you.png)
 
 On the top of each page once you've logged in, you'll see a navigation bar. On the very top of the navbar, you'll see links that will take you straight to your homepage, dropdowns to access lists of your favorite restaurants/menu items and your reviews for restaurants/menu items, and the option to log out.
 
 You'll also see your profile picture as a thumbnail with your full name next to it. Clicking on that will take you to your profile information page.
 
-![Profile Information Page](profile_info.png)
+![Profile Information Page](/static/images/profile_info.png)
 
 On this page, you'll see all your profile information, and have the option of updating your profile information such as your name, email, etc. You also have the option of resetting your password and setting/updating your current zip code location.
 
 Below the navbar is the restaurant search bar, which is also present on every page. You can search for restaurants by typing in a search query and a valid 5-digit US postal zip code, and you'll be taken to a page that lists out the restaurants near this zip code that match your search query.
 
-![Restaurant Search Results Page](restaurant_search.png)
+![Restaurant Search Results Page](/static/images/restaurant_search.png)
 
 If you click on any of these restaurant search results, a new tab will open and you'll be taken to the profile page for that restaurant location.
 
-![Subway Profile Page](restaurant_details.png)
+![Subway Profile Page](/static/images/restaurant_details.png)
 
 The above picture you see is a profile page for a Subway location in California. You'll see detailed information about the restaurant on this page, such as its address, coordinates, phone number, details about the restaurant, the cuisines it specializes in, and its opening hours.
 
@@ -54,15 +54,15 @@ When creating a review for the restaurant, you need to input a title and content
 
 At the bottom of the restaurant location's profile page, you'll also see all reviews for the restaurant location by all users, sorted newest first. Each review has the title, content, and date/time the review was first created. You'll also have the options to edit or delete the reviews you wrote. You can't do the same for reviews written by other users.
 
-![Subway Location Reviews](restaurant_review.png)
+![Subway Location Reviews](/static/images/restaurant_review.png)
 
 Also on the restaurant details page is a button that will take you to the list of menu items the restaurant chain offers, which is sorted in chronological order.
 
-![Subway Chain Menu Items Page ](menu_item_search.png)
+![Subway Chain Menu Items Page ](/static/images/menu_item_search.png)
 
 If you click on any of the menu items, you'll see the menu item profile page. This is just like the restaurant profile page. You'll see a picture of the menu item, the name of the item, and which restaurant it's form. You'll also see the buttons to add/remove the menu item to/from your list of favorite menu items, create your own review for the menu item, and edit/delete the reviews for this menu item that you've already written. Finally, you'll see all the reviews for the menu item among all users listed in chronological order (newest first) at the bottom of the page.
 
-![Subway Meataball Marinara Profile Page](menu_item_details_review.png)
+![Subway Meataball Marinara Profile Page](/static/images/menu_item_details_review.png)
 
 ## APIs Used and Link to Website
 
