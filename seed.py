@@ -18,6 +18,8 @@ app = create_app('vouch4food')
 connect_db(app)
 app.app_context().push()
 
+db.session.rollback()
+
 # Create all tables
 db.drop_all()
 db.create_all()

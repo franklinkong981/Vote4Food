@@ -41,7 +41,9 @@ def get_restaurant_photo_url(restaurant):
     
 def format_restaurant_phone_number(phone_number):
     """Each restaurant JSON object should have a numeric phone number that's either 10 or 11 digits. This function formats it into a string."""
-
+    if not phone_number:
+        return None
+    
     phone_number_string = str(phone_number)
     if len(phone_number_string) == 10:
         return "(" + phone_number_string[0:3] + ")-" + phone_number_string[3:6] + "-" + phone_number_string[6:]

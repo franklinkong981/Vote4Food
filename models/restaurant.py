@@ -2,6 +2,7 @@
 
 from models.init_db import db
 from datetime import datetime, timezone
+import uuid
 
 class Restaurant(db.Model):
     """Restaurant location, NOT restaurant chain. Each location of a restaurant will be a different instance of the Restaurant model.
@@ -10,7 +11,7 @@ class Restaurant(db.Model):
 
     __tablename__ = "restaurants"
 
-    id = db.Column(db.Text, primary_key=True)
+    id = db.Column(db.Uuid, primary_key=True)
     name = db.Column(db.Text, nullable=False)
     address = db.Column(db.Text)
     cuisines = db.Column(db.Text)
@@ -34,7 +35,7 @@ class Restaurant(db.Model):
         """Adds a new restaurant to the database through a pre-filled restaurant object."""
 
         new_restaurant = Restaurant(
-            id = restaurant['id'],
+            id = uuid.UUID(restaurant['id']).hex,
             name = restaurant['name'],
             address = restaurant['address'],
             cuisines = restaurant['cuisines'],
@@ -88,7 +89,7 @@ class Restaurant_Review(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='cascade'), nullable=False)
-    restaurant_id = db.Column(db.Text, db.ForeignKey('restaurants.id', ondelete='cascade'), nullable=False)
+    restaurant_id = db.Column(db.Uuid, db.ForeignKey('restaurants.id', ondelete='cascade'), nullable=False)
     title = db.Column(db.String(100), nullable=False)
     content = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
@@ -104,5 +105,5 @@ class Restaurant_Favorite(db.Model):
     __tablename__ = "restaurant_favorites"
 
     author_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='cascade'), primary_key=True)
-    restaurant_id = db.Column(db.Text, db.ForeignKey('restaurants.id', ondelete='cascade'), primary_key=True)
+    restaurant_id = db.Column(db.Uuid, db.ForeignKey('restaurants.id', ondelete='cascade'), primary_key=True)
     created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))

@@ -17,7 +17,7 @@
 			<div class="item-listings row">
 				{% for item in menu_item_results %}
 					<div class="item-listing col-lg-4 col-md-6 col-12">
-						<a class="item-link" href="{{url_for('display_item_page', item_id=item.id)}}" target="_blank">
+						<a class="item-link" href="{{url_for('display_item_page', item_id=item.id)}}">
 							<div class="item-card card">
 								<img class="card-image-top" src="{{item['image_url']}}" alt="Photo of {{item['title']}}"/>
 								<div class="card-body">

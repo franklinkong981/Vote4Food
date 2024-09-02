@@ -332,7 +332,7 @@ def create_app(db_name, testing=False):
             'longitude': restaurant['address']['longitude'],
             'cuisines': build_restaurant_cuisine_string(restaurant["cuisines"]),
             'description': restaurant["description"] or None,
-            'phone': format_restaurant_phone_number(restaurant["phone_number"]) if "phone_number" in restaurant else None,
+            'phone': restaurant["phone_number"] if "phone_number" in restaurant else None,
             'hours': restaurant['local_hours']['operational'] or None,
             'photo_url': get_restaurant_photo_url(restaurant)
         }
@@ -936,9 +936,8 @@ def create_app(db_name, testing=False):
     
     return app
 
-"""
+
 app = create_app('vouch4food')
 if __name__ == '__main__':
     connect_db(app)
     app.run(debug=True)
-"""

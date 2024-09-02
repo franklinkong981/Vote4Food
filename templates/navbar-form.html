@@ -3,11 +3,11 @@
     <form class="w-100" action="{{url_for('add_restaurants_to_db')}}", method="post">
       <div class="row">
         <div class="col">
-          <input type="text" class="form-control" id="search-field" name="query" placeholder="Search Restaurants" required>
+          <input type="text" class="form-control" id="search-field" name="query" placeholder="Search Restaurants, ex. pizza, burger, KFC, etc." required>
         </div>
         <div class="col">
           <div class="form-group row">
-            <input type="number" class="form-control" id="zip-code-field" name="zip_code" placeholder="Zip Code" min="10000" max="99999">
+            <input type="number" class="form-control" id="zip-code-field" name="zip_code" placeholder="5-digit US Zip Code" min="10000" max="99999">
           </div>
         </div>
         <div class="col">
