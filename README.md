@@ -72,6 +72,70 @@ Positionstack (for geocoding, zip code to longitude/latitude coordinates convers
 
 [Visit Vouch4Food here](https://vouch4food.onrender.com)
 
+## Installation Instructions
+
+You need to have Python 3, pip3, and PostgreSQL installed in order to run this app locally. Because the URL/password for the online Supabase database this website is connected to will not be provided, you will need to create your own (initially empty) database.
+
+Copy the SSH URL for this repo, then in your terminal/command line, navigate to the folder you want and do:
+
+```
+git clone ssh_url_here
+```
+
+There should be a folder called Vote4Food created, navigate into it.
+
+```
+cd Vote4Food
+```
+
+Next, set up a virtual environment.
+
+```
+python3 -m vev venv
+source venv/bin/activate
+```
+
+Finally, install all dependencies listed in the requirements.txt file to install all dependencies/software to run this app.
+
+```
+pip3 install -r requirements.txt
+```
+
+Finally, in order to run the app, you need to create an .env file in the root directory of the repo. You'll need to create an account on the websites for the [PositionStack API](https://positionstack.com/) and [Spoonacular API](https://spoonacular.com/food-api), both of which have free tiers, to generate a unique API key for each of them. 
+
+In addition, in a separate window on your terminal, you'll need to create 2 psql databases: One database that your app will run on and a separate database for testing. They need to be called vouch4food and vouch4food_test, respectively.
+
+```
+createdb vouch4food;
+createdb vouch4food_test;
+```
+
+Check to make sure the databases have been created by doing:
+
+```
+psql
+\l
+```
+
+This will list out the databases you created in psql. You should see vouch4food and vouch4food_test among them.
+
+Finally, in your .env file, include these 4 lines:
+
+```
+DATABASE_URL=postgresql:///vouch4food
+SECRET_KEY=Vouch4FoodSecretKey
+POSITION_STACK_API_KEY=YOUR_POSITIONSTACK_API_KEY
+SPOONACULAR_API_KEY=YOUR_SPOONACULAR_API_KEY
+```
+
+Now you should be all set to run your app. To do so, uncomment the lines from 940-943 in app.py and in the terminal, do:
+
+```
+python3 -m app.py
+```
+
+Now, in the browser of your choice, go to localhost:5000/ and you should be at the Vouch4Food home page, you are now running the app locally!
+
 ## Tools Used
 
 Copyright 2024. Created with the following tech stack:
