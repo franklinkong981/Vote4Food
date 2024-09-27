@@ -253,8 +253,8 @@ def create_app(db_name, testing=False):
                 g.user.first_name = form.first_name.data
                 g.user.last_name = form.last_name.data
                 g.user.email = form.email.data
-                g.user_image_url = form.user_image_url.data or None
-
+                g.user.user_image_url = form.user_image_url.data or User.user_image_url.default.arg
+                
                 try:
                     db.session.commit()
 
@@ -936,9 +936,9 @@ def create_app(db_name, testing=False):
     
     return app
 
-"""
+
 app = create_app('vouch4food')
 if __name__ == '__main__':
     connect_db(app)
     app.run(debug=True)
-"""
+
